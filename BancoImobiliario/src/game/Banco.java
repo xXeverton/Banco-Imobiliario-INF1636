@@ -2,8 +2,8 @@ package game;
 
 import java.util.ArrayList;
 
-class Banco {
-	private int dinheiro;
+public class Banco {
+	private double dinheiro;
 	private ArrayList<CardPropriedade> propriedades;
 	private ArrayList<CardCompanhia> companhias;
 	
@@ -13,7 +13,7 @@ class Banco {
 		this.companhias = new ArrayList<>();
 	}
 
-	public int getDinheiro() {
+	public double getDinheiro() {
 		return this.dinheiro;
 	}
 	
@@ -25,28 +25,48 @@ class Banco {
 		jogador.debito(200);
 	}
 	
-	public boolean venderPropriedadeParaJogador(Jogador jogador, CardPropriedade prop) {
-        if (prop.getDono().equals("banco") && jogador.comprarPropriedade(prop)) {
-            this.dinheiro += prop.getValor();
-            return true;
-        }
-        return false;
-    }
-    public void compraPropriedadeDoJogador(Jogador jogador, CardPropriedade prop) {
-        jogador.venderPropriedade(prop);
-    }
-	
-	
-	public boolean venderCompanhiaParaJogador(Jogador jogador, CardCompanhia comp) {
-	  if (comp.getDono().equals("banco") && jogador.comprarCompanhia(comp)) {
-	      this.dinheiro += comp.getValor();
-	      return true;
-	  }
-	  return false;
+	public boolean venderTituloParaJogador(Jogador jogador, CardTitulo titulo) {
+	    if (titulo.podeSerCompradoPor(jogador)) {
+	    	if (jogador.comprarTitulo(titulo));
+		        this.dinheiro += titulo.getValor();
+		        return true;
+	    }
+	    return false;
 	}
+	
+    public void compraPropriedadeDoJogador(Jogador jogador, CardPropriedade prop) {
+    	double valor;
+        valor = jogador.venderPropriedade(prop);
+        this.dinheiro += valor;
+        
+    }
+	
 	public void comprarCompanhiaDoJogador(Jogador jogador, CardCompanhia comp) {
 	  jogador.venderCompanhia(comp);
 	}
+	
+	public boolean construirCasaParaJogador(Jogador jogador, CardPropriedade propriedade) {
+	    // Garante que o jogador seja o dono da propriedade
+	    if (!propriedade.getDono().equals(jogador)) {
+	        System.out.println("Jogador não é o dono da propriedade " + propriedade.getNome());
+	        return false;
+	    }
+
+	    // Pede para o jogador tentar construir
+	    boolean sucesso = jogador.construirCasa(propriedade);
+
+	    // Se o jogador conseguiu construir, o banco recebe o valor
+	    if (sucesso) {
+	        int valorPago = (propriedade.isHotel())
+	            ? propriedade.getPrecoHotel()
+	            : propriedade.getPrecoCasa();
+	        this.dinheiro += valorPago;
+	        return true;
+	    }
+
+	    return false;
+	}
+
 	
 //	public void comprarCasaDaPropriedade(Jogador jogador, CardPropriedade prop) {
 //		if (prop.isHotel()) {

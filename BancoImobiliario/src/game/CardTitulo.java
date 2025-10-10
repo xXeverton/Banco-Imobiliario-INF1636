@@ -1,17 +1,22 @@
 package game;
 
-abstract class CardTitulo {
+public abstract class CardTitulo {
 	private String nome;
 	private int valor;
-	private String dono;
+	private Jogador dono;
 	
 	public CardTitulo(String nome, int valor) {
 		this.nome = nome;
 		this.valor = valor;
-		this.dono = "Banco";
+		this.dono = null;
 	}
 	
 	public abstract int calcularAluguel(int dados);
+	
+    public boolean podeSerCompradoPor(Jogador jogador) {
+        return this.getDono().equals(null);
+    }
+	
 	
 	public String getNome() {
 		return nome;
@@ -29,11 +34,11 @@ abstract class CardTitulo {
 		this.valor = valor;
 	}
 
-	public String getDono() {
-		return dono;
+	public Jogador getDono() {
+		return this.dono;
 	}
 
-	public void setDono(String dono) {
+	public void setDono(Jogador dono) {
 		this.dono = dono;
 	}
 }

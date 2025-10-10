@@ -2,7 +2,7 @@ package game;
 
 import java.util.ArrayList;
 
-class Tabuleiro {
+public class Tabuleiro {
     private ArrayList<Object> casas;
 
     public Tabuleiro() {
