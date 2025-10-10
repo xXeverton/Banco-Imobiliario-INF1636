@@ -3,7 +3,6 @@ package controller;
 import game.*;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class JogoController {
     private Tabuleiro tabuleiro;
