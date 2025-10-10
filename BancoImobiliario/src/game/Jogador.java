@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class Jogador {
 	private int numero_jogador;
 	private int dinheiro;
-	private ArrayList<CardPropriedade> propriedades; // TODO adicionar do tipo array
+	private ArrayList<CardPropriedade> propriedades;
 	private boolean preso;
 	
 
@@ -50,8 +50,16 @@ class Jogador {
 	}
 	
     public boolean comprarPropriedade(CardPropriedade prop) {
-    	this.dinheiro = this.dinheiro - prop.preco;
-        this.propriedades.add(prop);
+    	if (this.dinheiro > prop.getValor()) {
+	    	this.dinheiro = this.dinheiro - prop.getValor();
+	        this.propriedades.add(prop);
+	        return true;
+    	}
+    	else {
+    		System.out.println("Jogador não possui dinheiro suficiente");
+    		return false;
+    		
+    	}
     }
 
     public void venderPropriedade(CardPropriedade prop) {
