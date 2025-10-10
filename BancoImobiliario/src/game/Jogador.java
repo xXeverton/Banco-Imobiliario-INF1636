@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 class Jogador {
 	private int numero_jogador;
-	private int dinheiro;
+	private double dinheiro;
 	private ArrayList<CardPropriedade> propriedades;
 	private boolean preso;
 	
@@ -25,7 +25,7 @@ class Jogador {
 		this.numero_jogador = numero_jogador;
 	}
 
-	public int getDinheiro() {
+	public double getDinheiro() {
 		return dinheiro;
 	}
 	
@@ -63,8 +63,18 @@ class Jogador {
     }
 
     public void venderPropriedade(CardPropriedade prop) {
-    	this.dinheiro = 0.9*(prop.value + (prop.casa.value * prop.num_casas) + (prop.hotel.value * prop.num_hoteis));
-    	prop.setDono("banco");
+        if (prop.isHotel()) {
+            this.dinheiro = this.dinheiro + 0.9 * (
+                prop.getValor() + (prop.getPrecoCasa() * prop.getCasas()) + prop.getPrecoHotel()
+            );
+        } else {
+            this.dinheiro = this.dinheiro + 0.9 * (
+                prop.getValor() + (prop.getPrecoCasa() * prop.getCasas())
+            );
+        }
+
+        prop.setDono("banco");
         this.propriedades.remove(prop);
     }
+
 }
