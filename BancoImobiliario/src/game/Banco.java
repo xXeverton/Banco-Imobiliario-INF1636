@@ -1,16 +1,10 @@
 package game;
 
-import java.util.ArrayList;
-
 public class Banco {
 	private double dinheiro;
-	private ArrayList<CardPropriedade> propriedades;
-	private ArrayList<CardCompanhia> companhias;
 	
 	public Banco() {
 		this.dinheiro = 200000;
-		this.propriedades = new ArrayList<>();
-		this.companhias = new ArrayList<>();
 	}
 
 	public double getDinheiro() {
@@ -19,10 +13,12 @@ public class Banco {
 	
 	public void premiacaoJogador(Jogador jogador) {
 		jogador.credito(200);
+		this.dinheiro -= 200;
 	}
 	
 	public void impostoJogador(Jogador jogador) {
 		jogador.debito(200);
+		this.dinheiro += 200;
 	}
 	
 	public boolean venderTituloParaJogador(Jogador jogador, CardTitulo titulo) {

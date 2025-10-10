@@ -10,6 +10,7 @@ public class Jogador {
 	private boolean preso;
 	private String cor;
 	private int rodadasPreso;
+	private int posicao;
 
 	public Jogador(int numero_jogador, String cor) {
 		this.numero_jogador = numero_jogador;
@@ -18,6 +19,7 @@ public class Jogador {
 		this.companhias = new ArrayList<>();
         this.preso = false;
         this.cor = cor;
+        this.posicao = 0;
 	}
 	
 	public String getCor() {
@@ -145,5 +147,14 @@ public class Jogador {
             this.rodadasPreso++;
         }
     }
+
+	public int getPosicao() {
+		return posicao;
+	}
+
+	public void setPosicao(int posicao) {
+		this.posicao = posicao;
+	}
+	
     
 }

@@ -1,12 +1,12 @@
 package game;
 
-public abstract class CardTitulo {
+public abstract class CardTitulo extends Casa {
 	private String nome;
 	private int valor;
 	private Jogador dono;
 	
 	public CardTitulo(String nome, int valor) {
-		this.nome = nome;
+		super(nome);
 		this.valor = valor;
 		this.dono = null;
 	}
@@ -41,4 +41,8 @@ public abstract class CardTitulo {
 	public void setDono(Jogador dono) {
 		this.dono = dono;
 	}
+    @Override
+    public TipoCasa getTipo() {
+        return TipoCasa.TITULO;
+    }
 }
