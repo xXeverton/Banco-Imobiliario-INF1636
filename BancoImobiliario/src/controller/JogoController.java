@@ -10,6 +10,7 @@ public class JogoController {
     private List<Jogador> jogadores;
     private Dado dado;
     private int jogadorAtual;
+    private Banco banco;
 
     public JogoController() {
         this.tabuleiro = new Tabuleiro();
@@ -25,76 +26,141 @@ public class JogoController {
     public int lancarDados() {
     	ArrayList<Integer> valores = dado.lancarDados();
     	int resultado = valores.get(0) + valores.get(1);
-        System.out.println("Jogador " + getJogadorAtual().getNumero_jogador() + " tirou " + valores.get(0) + "," + valores.get(1));
+        System.out.println("Jogador " + getJogadorAtual().getCor() + " tirou " + valores.get(0) + "," + valores.get(1));
         return resultado;
     }
 
-    // 2️⃣ Deslocar o jogador da vez  // TODO Criar uma classe casa para que no tabuleiro possa andar por esse objeto
-//    public void moverJogador(int casas) {
-//        Jogador j = getJogadorAtual();
-//        tabuleiro.moverJogador(j, casas);
-//    }
+    // Deslocar o jogador da vez
+    public void moverJogador(int casas) {
+        Jogador j = getJogadorAtual();
+        Casa casa = tabuleiro.moverJogador(j, casas); // Retorna a casa que o jogador parou
 
-    public void comprarPropriedade(CardTitulo titulo) {
-        Jogador jogadorAtual = getJogadorAtual();
+        System.out.println("Jogador " + j.getNumero_jogador() + " caiu em " + casa.getNome());
 
-        // Verifica se é uma propriedade e se ainda não tem dono
-        if (titulo instanceof CardPropriedade) {
-            CardPropriedade propriedade = (CardPropriedade) titulo;
+        switch (casa.getTipo()) {
+            case PARTIDA:
+                System.out.println("Passou ou caiu na casa de Partida. Recebe R$200.");
+                j.credito(200);
+                break;
 
-            // Pede para o banco vender a propriedade
-            boolean sucesso = banco.venderPropriedadeParaJogador(jogadorAtual, propriedade);
+            case PRISAO:
+                System.out.println("Está apenas visitando a prisão.");
+                break;
 
-            if (sucesso) {
-                System.out.println("Jogador " + jogadorAtual.getNumero_jogador() + 
-                                   " comprou a propriedade " + propriedade.getNome());
-            } else {
-                System.out.println("Jogador " + jogadorAtual.getNumero_jogador() + 
-                                   " não conseguiu comprar a propriedade " + propriedade.getNome());
-            }
-        } else {
-            System.out.println("Este título não é uma propriedade comprável.");
+            case VA_PARA_PRISAO:
+                System.out.println("Você foi preso!");
+                this.prenderJogador();
+                break;
+
+            case SORTE_REVES:
+                System.out.println("Comprando carta Sorte ou Revés...");
+//                comprarCartaSorteReves(j);
+                break;
+
+            case IMPOSTO:
+                System.out.println("Pagando imposto de R$100 ao banco.");
+                banco.impostoJogador(j);
+                break;
+
+            case TITULO:
+            	CardTitulo prop = null;
+
+            	if (casa instanceof CardPropriedade propriedade) {
+            	    prop = propriedade;
+            	} else if (casa instanceof CardCompanhia companhia) {
+            	    prop = companhia;
+            	}
+            	 
+                if (prop.getDono() == null) {
+                    System.out.println("Essa propriedade está disponível para compra por R$" + prop.getValor());
+                    // Aqui você pode abrir menu de compra ou fazer compra automática // TODO decidir forma de compra
+                } else if (prop.getDono() != j) {
+                    int aluguel = prop.calcularAluguel(casas);
+                    System.out.println("Pagando aluguel de R$" + aluguel + " para Jogador " + prop.getDono().getNumero_jogador());
+                    j.debito(aluguel);
+                    prop.getDono().credito(aluguel);
+                }
+                
+                break;
+
+            default:
+                System.out.println("Casa livre, nada acontece.");
+                break;
         }
     }
 
-    // 4️⃣ Construir casa
-    public void construirCasa(CardPropriedade prop) {
-        Jogador j = getJogadorAtual();
-        if (prop.getDono() == j && j.getDinheiro() >= prop.getPrecoCasa()) {
-            prop.construirCasa();
-            j.setDinheiro(j.getDinheiro() - prop.getPrecoCasa());
-            System.out.println(j.getNumero_jogador() + " construiu uma casa em " + prop.getNome());
-        }
-    } // TODO fazer a mesma lógica de cima e criar os métodos no banco e no Jogador
 
-    // 5️⃣ Pagar aluguel
+    public void comprarTitulo(CardTitulo titulo) {
+        Jogador jogadorAtual = getJogadorAtual();
+
+        boolean sucesso = banco.venderTituloParaJogador(jogadorAtual, titulo);
+
+        if (sucesso) {
+            System.out.println("Jogador " + jogadorAtual.getCor() + 
+                               " comprou o título " + titulo.getNome());
+        } else {
+            System.out.println("Jogador " + jogadorAtual.getCor() + 
+                               " não conseguiu comprar o título " + titulo.getNome());
+        }
+    }
+
+    // Construir casa
+    public void construirCasa(CardPropriedade propriedade) {
+        Jogador jogadorAtual = getJogadorAtual();
+
+        boolean sucesso = banco.construirCasaParaJogador(jogadorAtual, propriedade);
+
+        if (sucesso) {
+            System.out.println("Jogador " + jogadorAtual.getCor() +
+                               " construiu em " + propriedade.getNome());
+        } else {
+            System.out.println("Jogador " + jogadorAtual.getCor() +
+                               " não conseguiu construir em " + propriedade.getNome());
+        }
+    }
+
+    // Pagar aluguel
     public void pagarAluguel(CardPropriedade prop, int valorDados) {
         Jogador j = getJogadorAtual();
         Jogador dono = prop.getDono();
 
         if (dono != null && dono != j && (prop.getCasas() > 0 || prop.isHotel())) {
             int aluguel = prop.calcularAluguel(valorDados);
-            j.setDinheiro(j.getDinheiro() - aluguel);  // TODO método de pagar aluguel dentro de jogador
-            dono.setDinheiro(dono.getDinheiro() + aluguel); // TODO método para receber aluguel dentro do jogador
-            System.out.println(j.getNumero_jogador() + " pagou aluguel de " + aluguel + " a " + dono.getNumero_jogador());
+            j.debito(aluguel);  
+            dono.credito(aluguel); 
+            System.out.println(j.getCor() + " pagou aluguel de " + aluguel + " a " + dono.getCor());
         }
     }
 
-    // 6️⃣ Prisão (simplificado)
+    // Prisão
     public void prenderJogador() {
         getJogadorAtual().setPreso(true);
-        System.out.println("Jogador " + getJogadorAtual().getNumero_jogador() + " foi preso!");
-    } // TODO contar rodadas que o jogador ta preso
+        System.out.println("Jogador " + getJogadorAtual().getCor() + " foi preso!");
+    }
+    
+    public void processarRodadaPrisao(Jogador jogador) {
+        if (jogador.isPreso()) {
+            jogador.incrementarRodadaPreso();
+
+            System.out.println("Jogador " + jogador.getCor() + 
+                               " está preso há " + jogador.getRodadasPreso() + " rodada(s).");
+
+            if (jogador.getRodadasPreso() >= 3) {
+                this.soltarJogador();
+            }
+        }
+    }
 
     public void soltarJogador() {
+    	
         getJogadorAtual().setPreso(false);
-        System.out.println("Jogador " + getJogadorAtual().getNumero_jogador() + " saiu da prisão!");
+        System.out.println("Jogador " + getJogadorAtual().getCor() + " saiu da prisão!");
     }
 
     public void verificarFalencia() {
         Jogador j = getJogadorAtual();
         if (j.getDinheiro() < 0) {
-            System.out.println("Jogador " + j.getNumero_jogador() + " faliu e saiu do jogo!");
+            System.out.println("Jogador " + j.getCor() + " faliu e saiu do jogo!");
             jogadores.remove(j);
         }
     }

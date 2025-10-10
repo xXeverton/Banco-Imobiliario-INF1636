@@ -3,7 +3,7 @@ package game;
 import java.util.Random;
 import java.util.ArrayList;
 
-class Dado {
+public class Dado {
 	private Random random;
 	
 	public Dado() {
