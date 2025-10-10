@@ -60,5 +60,5 @@ public class CardPropriedade extends CardTitulo {
     public int calcularAluguel(int dados) {
         if (this.hotel) return alugueis[5]; 
         return alugueis[casas];       
-    }
+    }    
 }

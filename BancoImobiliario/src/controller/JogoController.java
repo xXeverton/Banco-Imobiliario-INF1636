@@ -30,11 +30,65 @@ public class JogoController {
         return resultado;
     }
 
-    // Deslocar o jogador da vez  // TODO Criar uma classe casa para que no tabuleiro possa andar por esse objeto
+    // Deslocar o jogador da vez
     public void moverJogador(int casas) {
         Jogador j = getJogadorAtual();
-        tabuleiro.moverJogador(j, casas);
+        Casa casa = tabuleiro.moverJogador(j, casas); // Retorna a casa que o jogador parou
+
+        System.out.println("Jogador " + j.getNumero_jogador() + " caiu em " + casa.getNome());
+
+        switch (casa.getTipo()) {
+            case PARTIDA:
+                System.out.println("Passou ou caiu na casa de Partida. Recebe R$200.");
+                j.credito(200);
+                break;
+
+            case PRISAO:
+                System.out.println("Está apenas visitando a prisão.");
+                break;
+
+            case VA_PARA_PRISAO:
+                System.out.println("Você foi preso!");
+                this.prenderJogador();
+                break;
+
+            case SORTE_REVES:
+                System.out.println("Comprando carta Sorte ou Revés...");
+//                comprarCartaSorteReves(j);
+                break;
+
+            case IMPOSTO:
+                System.out.println("Pagando imposto de R$100 ao banco.");
+                banco.impostoJogador(j);
+                break;
+
+            case TITULO:
+            	CardTitulo prop = null;
+
+            	if (casa instanceof CardPropriedade propriedade) {
+            	    prop = propriedade;
+            	} else if (casa instanceof CardCompanhia companhia) {
+            	    prop = companhia;
+            	}
+            	 
+                if (prop.getDono() == null) {
+                    System.out.println("Essa propriedade está disponível para compra por R$" + prop.getValor());
+                    // Aqui você pode abrir menu de compra ou fazer compra automática // TODO decidir forma de compra
+                } else if (prop.getDono() != j) {
+                    int aluguel = prop.calcularAluguel(casas);
+                    System.out.println("Pagando aluguel de R$" + aluguel + " para Jogador " + prop.getDono().getNumero_jogador());
+                    j.debito(aluguel);
+                    prop.getDono().credito(aluguel);
+                }
+                
+                break;
+
+            default:
+                System.out.println("Casa livre, nada acontece.");
+                break;
+        }
     }
+
 
     public void comprarTitulo(CardTitulo titulo) {
         Jogador jogadorAtual = getJogadorAtual();
