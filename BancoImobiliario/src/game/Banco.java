@@ -6,21 +6,23 @@ class Banco {
 	private int dinheiro;
 	//private ArrayList<CardPropriedade> propriedades;
 	//private ArrayList<CardCompanhia> companhias;
-	//private ArrayList<CardTerrenos> terrenos;
 	
 	public Banco() {
 		this.dinheiro = 200000;
 		//this.propriedades = new ArrayList<>();
 		//this.companhias = new ArrayList<>();
-		//this.terrenos = new ArrayList<>();
 	}
 
 	public int getDinheiro() {
 		return this.dinheiro;
 	}
 	
-	public void premiacaoInicio(Jogador jogador) {
+	public void premiacaoJogador(Jogador jogador) {
 		jogador.credito(200);
+	}
+	
+	public void impostoJogador(Jogador jogador) {
+		jogador.debito(200);
 	}
 	
 //	public boolean venderPropriedadeParaJogador(Jogador jogador, CardPropriedade prop) {
@@ -47,19 +49,5 @@ class Banco {
 //	public void comprarCompanhiaDoJogador(Jogador jogador, CardCompanhia comp) {
 //	  jogador.venderCompanhia(comp);
 //	}
-	
-	
-//	public boolean venderTerrenoParaJogador(Jogador jogador, CardTerreno terreno) {
-//	  if (terreno.getDono().equals("banco") && jogador.getDinheiro() >= terreno.getPreco()) {
-//	      jogador.comprarTerreno(terreno);
-//	      this.dinheiro += terreno.getPreco();
-//	      return true;
-//	  }
-//	  return false;
-//	}
-//	public void comprarTerrenoDoJogador(Jogador jogador, CardTerreno terreno) {
-//	  jogador.venderTerreno(terreno);
-//	}
-	
 	
 }
