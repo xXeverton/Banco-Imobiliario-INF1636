@@ -3,6 +3,16 @@ package game;
 abstract class CardTitulo {
 	private String nome;
 	private int valor;
+	private String dono;
+	
+	public CardTitulo(String nome, int valor) {
+		this.nome = nome;
+		this.valor = valor;
+		this.dono = "Banco";
+	}
+	
+	public abstract int calcularAluguel(int dados);
+	
 	public String getNome() {
 		return nome;
 	}
@@ -26,14 +36,4 @@ abstract class CardTitulo {
 	public void setDono(String dono) {
 		this.dono = dono;
 	}
-
-	private String dono;
-	
-	public CardTitulo(String nome, int valor) {
-		this.nome = nome;
-		this.valor = valor;
-	}
-    
-    public abstract int calcularAluguel(int dados);
-
 }
