@@ -7,6 +7,7 @@ public class Tabuleiro {
 
     public Tabuleiro() {
         casas = new ArrayList<>();
+        inicializarCasas();
     }
     
     public void inicializarCasas() {
@@ -68,7 +69,6 @@ public class Tabuleiro {
         jogador.setPosicao(novaPosicao);
 
         Casa casa = casas.get(novaPosicao);
-        System.out.println("Jogador " + jogador.getNumero_jogador() + " caiu em " + casa.getNome());
         return casa;
     }
 

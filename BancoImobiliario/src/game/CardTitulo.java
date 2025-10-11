@@ -1,7 +1,6 @@
 package game;
 
 public abstract class CardTitulo extends Casa {
-	private String nome;
 	private int valor;
 	private Jogador dono;
 	
@@ -14,17 +13,8 @@ public abstract class CardTitulo extends Casa {
 	public abstract int calcularAluguel(int dados);
 	
     public boolean podeSerCompradoPor(Jogador jogador) {
-        return this.getDono().equals(null);
+        return this.getDono() == null;
     }
-	
-	
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
 
 	public int getValor() {
 		return valor;

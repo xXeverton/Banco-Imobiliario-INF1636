@@ -61,14 +61,40 @@ public class Banco {
 	    }
 
 	    return false;
-	}
+	}	
+	
+	public boolean construirHotelParaJogador(Jogador jogador, CardPropriedade propriedade) {
+	    // Garante que o jogador seja o dono da propriedade
+	    if (!propriedade.getDono().equals(jogador)) {
+	        System.out.println("Jogador não é o dono da propriedade " + propriedade.getNome());
+	        return false;
+	    }
 
+	    // Pede para o jogador tentar construir
+	    propriedade.setCasas(4);
+	    boolean sucesso = jogador.construirCasa(propriedade);
+
+	    // Se o jogador conseguiu construir, o banco recebe o valor
+	    if (sucesso) {
+	        int valorPago = (propriedade.isHotel())
+	            ? propriedade.getPrecoHotel()
+	            : propriedade.getPrecoCasa();
+	        this.dinheiro += valorPago;
+	        return true;
+	    }
+	    return false;
+	}	
 	
-//	public void comprarCasaDaPropriedade(Jogador jogador, CardPropriedade prop) {
-//		if (prop.isHotel()) {
-//			// TO DO
-//		}
-//	}
-	
-	
+	public boolean pagarMultaPrisao(Jogador jogador) {
+	    int multa = 50;
+	    if (jogador.getDinheiro() >= multa) {
+	        jogador.debito(multa);
+	        this.dinheiro += multa;
+	        System.out.println("Jogador " + jogador.getCor() + " pagou multa de R$" + multa + " para sair da prisão.");
+	        return true;
+	    } else {
+	        System.out.println("Jogador " + jogador.getCor() + " não tem dinheiro suficiente para pagar a multa.");
+	        return false;
+	    }
+	}
 }

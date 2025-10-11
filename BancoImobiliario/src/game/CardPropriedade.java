@@ -7,6 +7,15 @@ public class CardPropriedade extends CardTitulo {
     private int casas;
     private boolean hotel;
 
+	public CardPropriedade(String nome, int valor, int precoCasa, int precoHotel, int[] alugueis) {
+	    super(nome, valor);
+	    this.precoCasa = precoCasa;
+	    this.precoHotel = precoHotel;
+	    this.alugueis = alugueis;
+	    this.casas = 0;
+	    this.hotel = false;
+	}
+    
     public int[] getAlugueis() {
 		return alugueis;
 	}
@@ -47,15 +56,6 @@ public class CardPropriedade extends CardTitulo {
 		this.hotel = hotel;
 	}
 
-	public CardPropriedade(String nome, int valor, int precoCasa, int precoHotel, int[] alugueis) {
-	    super(nome, valor);
-	    this.precoCasa = precoCasa;
-	    this.precoHotel = precoHotel;
-	    this.alugueis = alugueis;
-	    this.casas = 0;
-	    this.hotel = false;
-	}
-    
     @Override
     public int calcularAluguel(int dados) {
         if (this.hotel) return alugueis[5]; 

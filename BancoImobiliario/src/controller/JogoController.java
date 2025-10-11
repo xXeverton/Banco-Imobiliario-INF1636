@@ -1,10 +1,13 @@
 package controller;
 
 import game.*;
+
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class JogoController {
+	private Scanner scanner;
     private Tabuleiro tabuleiro;
     private List<Jogador> jogadores;
     private Dado dado;
@@ -12,8 +15,10 @@ public class JogoController {
     private Banco banco;
 
     public JogoController() {
+    	this.scanner = new Scanner(System.in);
         this.tabuleiro = new Tabuleiro();
         this.jogadores = new ArrayList<>();
+        this.banco = new Banco();
         this.dado = new Dado();
         this.jogadorAtual = 0;
     }
@@ -37,7 +42,7 @@ public class JogoController {
         System.out.println("Jogador " + j.getNumero_jogador() + " caiu em " + casa.getNome());
 
         switch (casa.getTipo()) {
-            case PARTIDA:
+            case PARTIDA: // to do
                 System.out.println("Passou ou caiu na casa de Partida. Recebe R$200.");
                 j.credito(200);
                 break;
@@ -47,7 +52,10 @@ public class JogoController {
                 break;
 
             case VA_PARA_PRISAO:
+            	CasaVaParaPrisao vp_casa = (CasaVaParaPrisao) casa;
+
                 System.out.println("Você foi preso!");
+                j.setPosicao(vp_casa.getPosicaoPrisao());
                 this.prenderJogador();
                 break;
 
@@ -77,12 +85,33 @@ public class JogoController {
             	 
                 if (prop.getDono() == null) {
                     System.out.println("Essa propriedade está disponível para compra por R$" + prop.getValor());
+                    System.out.print("Deseja comprá-la? \n(1) sim \n(2) não\n");
+                    int resposta = scanner.nextInt();
+                    if (resposta == 1) {
+                        comprarTitulo(prop);
+                        prop.setDono(getJogadorAtual());
+                    }
                     // Aqui você pode abrir menu de compra ou fazer compra automática // TODO decidir forma de compra
                 } else if (prop.getDono() != j) {
                     int aluguel = prop.calcularAluguel(casas);
                     System.out.println("Pagando aluguel de R$" + aluguel + " para Jogador " + prop.getDono().getNumero_jogador());
                     j.debito(aluguel);
                     prop.getDono().credito(aluguel);
+                    
+                } else if (prop.getDono() == j && prop instanceof CardPropriedade propriedade) {
+                	
+                	if (!propriedade.isHotel() && propriedade.getCasas() < 4) { // to do, fazer hotel quando tiver 1 casa
+                		System.out.println("Você possui " + propriedade.getCasas() + " casa(s) em " + propriedade.getNome());
+                        System.out.print("Deseja construir uma casa por R$" + propriedade.getPrecoCasa() + " ou um hotel pelo mesmo preço? \n(1) casa \n(2) hotel \n(3) não fazer nada\n");
+                        
+                        int resposta = scanner.nextInt();
+
+                        if (resposta == 1) {
+                            construirCasa(propriedade);
+                        } else if (resposta == 2) {
+                        	construirHotel(propriedade);
+                        }
+                	}
                 }
                 
                 break;
@@ -122,6 +151,21 @@ public class JogoController {
                                " não conseguiu construir em " + propriedade.getNome());
         }
     }
+    
+    // Construir hotel
+    public void construirHotel(CardPropriedade propriedade) {
+        Jogador jogadorAtual = getJogadorAtual();
+
+        boolean sucesso = banco.construirHotelParaJogador(jogadorAtual, propriedade);
+
+        if (sucesso) {
+            System.out.println("Jogador " + jogadorAtual.getCor() +
+                               " construiu em " + propriedade.getNome());
+        } else {
+            System.out.println("Jogador " + jogadorAtual.getCor() +
+                               " não conseguiu construir em " + propriedade.getNome());
+        }
+    }
 
     // Pagar aluguel
     public void pagarAluguel(CardPropriedade prop, int valorDados) {
@@ -144,14 +188,27 @@ public class JogoController {
     
     public void processarRodadaPrisao(Jogador jogador) {
         if (jogador.isPreso()) {
-            jogador.incrementarRodadaPreso();
+        	ArrayList<Integer> valores = dado.lancarDados();
+        	System.out.println("Valores " + valores.get(0) + " e " + valores.get(1));
+        	if (valores.get(0) == valores.get(1)) {
+        		jogador.setRodadasPreso(0);
+                this.soltarJogador();
+                return;
+        	}
 
             System.out.println("Jogador " + jogador.getCor() + 
                                " está preso há " + jogador.getRodadasPreso() + " rodada(s).");
-
-            if (jogador.getRodadasPreso() >= 3) {
+            if (jogador.getRodadasPreso() == 3) {
+            	System.out.println("Próxima rodada o jogador" + jogador.getCor() + "saira do banco pagando uma multa de R$50 caso não acerte os dados");
+            }
+            jogador.incrementarRodadaPreso();
+            
+            if (jogador.getRodadasPreso() > 3) {
+            	banco.pagarMultaPrisao(jogador);
+                jogador.setRodadasPreso(0);
                 this.soltarJogador();
             }
+            
         }
     }
 
