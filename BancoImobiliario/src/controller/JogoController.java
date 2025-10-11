@@ -38,15 +38,15 @@ public class JogoController {
     public void moverJogador(int casas) {
         Jogador j = getJogadorAtual();
         Casa casa = tabuleiro.moverJogador(j, casas); // Retorna a casa que o jogador parou
-
+        
         System.out.println("Jogador " + j.getNumero_jogador() + " caiu em " + casa.getNome());
-
+        
         switch (casa.getTipo()) {
-            case PARTIDA: // to do
-                System.out.println("Passou ou caiu na casa de Partida. Recebe R$200.");
+            case PARTIDA:
+                System.out.println("Caiu na casa de Partida. Recebe R$200.");
                 j.credito(200);
                 break;
-
+            
             case PRISAO:
                 System.out.println("Está apenas visitando a prisão.");
                 break;
@@ -91,7 +91,6 @@ public class JogoController {
                         comprarTitulo(prop);
                         prop.setDono(getJogadorAtual());
                     }
-                    // Aqui você pode abrir menu de compra ou fazer compra automática // TODO decidir forma de compra
                 } else if (prop.getDono() != j) {
                     int aluguel = prop.calcularAluguel(casas);
                     System.out.println("Pagando aluguel de R$" + aluguel + " para Jogador " + prop.getDono().getNumero_jogador());
@@ -100,16 +99,29 @@ public class JogoController {
                     
                 } else if (prop.getDono() == j && prop instanceof CardPropriedade propriedade) {
                 	
-                	if (!propriedade.isHotel() && propriedade.getCasas() < 4) { // to do, fazer hotel quando tiver 1 casa
+                	if (!propriedade.isHotel() && propriedade.getCasas() < 4) {
                 		System.out.println("Você possui " + propriedade.getCasas() + " casa(s) em " + propriedade.getNome());
-                        System.out.print("Deseja construir uma casa por R$" + propriedade.getPrecoCasa() + " ou um hotel pelo mesmo preço? \n(1) casa \n(2) hotel \n(3) não fazer nada\n");
-                        
-                        int resposta = scanner.nextInt();
+                		int resposta;
+                		if (propriedade.getCasas() < 1) {
+                			System.out.print("Deseja construir uma casa por R$" + propriedade.getPrecoCasa() + "? \n(1) casa \n(2) não fazer nada\n");
+                			resposta = scanner.nextInt();
+                			if (resposta == 1) {
+                                construirCasa(propriedade);
+                			}
+                		} else if (!propriedade.isHotel()){
+                			System.out.print("Deseja construir uma casa por R$" + propriedade.getPrecoCasa() + " ou um hotel pelo mesmo preço? \n(1) casa \n(2) hotel \n(3) não fazer nada\n");
+                            resposta = scanner.nextInt();
 
-                        if (resposta == 1) {
-                            construirCasa(propriedade);
-                        } else if (resposta == 2) {
-                        	construirHotel(propriedade);
+                            if (resposta == 1) {
+                                construirCasa(propriedade);
+                            } else if (resposta == 2) {
+                            	construirHotel(propriedade);
+                            }
+                        
+                		} else {
+                            	System.out.print("Você possui hotel nessa propriedade");
+                            	System.out.print("Deseja construir uma casa por R$" + propriedade.getPrecoCasa() + "? \n(1) casa \n(2) não fazer nada\n");
+                    			resposta = scanner.nextInt();
                         }
                 	}
                 }
@@ -195,13 +207,13 @@ public class JogoController {
                 this.soltarJogador();
                 return;
         	}
-
+            jogador.incrementarRodadaPreso();
             System.out.println("Jogador " + jogador.getCor() + 
                                " está preso há " + jogador.getRodadasPreso() + " rodada(s).");
+            
             if (jogador.getRodadasPreso() == 3) {
-            	System.out.println("Próxima rodada o jogador" + jogador.getCor() + "saira do banco pagando uma multa de R$50 caso não acerte os dados");
+            	System.out.println("Próxima rodada o jogador " + jogador.getCor() + " saira do banco pagando uma multa de R$50 caso não acerte os dados");
             }
-            jogador.incrementarRodadaPreso();
             
             if (jogador.getRodadasPreso() > 3) {
             	banco.pagarMultaPrisao(jogador);

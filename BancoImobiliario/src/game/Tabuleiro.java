@@ -65,9 +65,16 @@ public class Tabuleiro {
     }
     
     public Casa moverJogador(Jogador jogador, int casasMover) {
+    	int posicaoAtual =  jogador.getPosicao();
         int novaPosicao = (jogador.getPosicao() + casasMover) % casas.size();
         jogador.setPosicao(novaPosicao);
-
+        
+        // Jogador passou direto pela casa de partida
+        if (posicaoAtual + casasMover > casas.size()) {
+        	System.out.println("Jogador " + jogador.getNumero_jogador() + " passou pela casa de Partida e recebeu R$200!");
+            jogador.credito(200);
+        }
+        
         Casa casa = casas.get(novaPosicao);
         return casa;
     }
