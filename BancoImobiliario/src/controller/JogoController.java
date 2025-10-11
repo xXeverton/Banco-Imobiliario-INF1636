@@ -57,8 +57,13 @@ public class JogoController {
                 break;
 
             case IMPOSTO:
-                System.out.println("Pagando imposto de R$100 ao banco.");
+                System.out.println("Pagando imposto de R$200 ao banco.");
                 banco.impostoJogador(j);
+                break;
+                
+            case LUCROS_DIVIDENDOS:
+                System.out.println("Recebendo dividendo de R$200 do banco.");
+                banco.premiacaoJogador(j);
                 break;
 
             case TITULO:
