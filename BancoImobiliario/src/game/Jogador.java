@@ -105,33 +105,44 @@ public class Jogador {
 
     public boolean construirCasa(CardPropriedade propriedade) {
         if (propriedade.isHotel()) {
+            System.out.println("Não é possível construir casas, já há um hotel nesta propriedade!");
+            return false;
+        }
+
+        if (this.dinheiro < propriedade.getPrecoCasa()) {
+            System.out.println("Dinheiro insuficiente para construir a casa.");
+            return false;
+        }
+
+        // Construindo casa
+        this.dinheiro -= propriedade.getPrecoCasa();
+        propriedade.setCasas(propriedade.getCasas() + 1);
+        System.out.println("Casa construída em " + propriedade.getNome());
+        return true;
+    }
+
+    // Constrói um hotel em uma propriedade
+    public boolean construirHotel(CardPropriedade propriedade) {
+        if (propriedade.isHotel()) {
             System.out.println("Já há um hotel nesta propriedade!");
             return false;
         }
 
-        if (propriedade.getCasas() == 4) {
-            // Tentando construir um hotel
-            if (this.dinheiro >= propriedade.getPrecoHotel()) {
-                this.dinheiro -= propriedade.getPrecoHotel();
-                propriedade.setHotel(true);
-                System.out.println("Hotel construído em " + propriedade.getNome());
-                return true;
-            } else {
-                System.out.println("Dinheiro insuficiente para construir o hotel.");
-                return false;
-            }
-        } else {
-            // Construindo casa
-            if (this.dinheiro >= propriedade.getPrecoCasa()) {
-                this.dinheiro -= propriedade.getPrecoCasa();
-                propriedade.setCasas(propriedade.getCasas() + 1);
-                System.out.println("Casa construída em " + propriedade.getNome());
-                return true;
-            } else {
-                System.out.println("Dinheiro insuficiente para construir a casa.");
-                return false;
-            }
+        if (propriedade.getCasas() < 1) {
+            System.out.println("É necessário ter pelo menos 1 casa para construir um hotel.");
+            return false;
         }
+
+        if (this.dinheiro < propriedade.getPrecoHotel()) {
+            System.out.println("Dinheiro insuficiente para construir o hotel.");
+            return false;
+        }
+
+        // Construindo hotel
+        this.dinheiro -= propriedade.getPrecoHotel();
+        propriedade.setHotel(true);
+        System.out.println("Hotel construído em " + propriedade.getNome());
+        return true;
     }
 
 	public int getRodadasPreso() {
