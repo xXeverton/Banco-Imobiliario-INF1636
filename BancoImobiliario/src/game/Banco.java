@@ -71,8 +71,7 @@ public class Banco {
 	    }
 
 	    // Pede para o jogador tentar construir
-	    propriedade.setCasas(4);
-	    boolean sucesso = jogador.construirCasa(propriedade);
+	    boolean sucesso = jogador.construirHotel(propriedade);
 
 	    // Se o jogador conseguiu construir, o banco recebe o valor
 	    if (sucesso) {
