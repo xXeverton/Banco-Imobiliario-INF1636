@@ -58,6 +58,10 @@ public class JogoView {
             controller.moverJogador(casas);
 
             controller.verificarFalencia();
+            if (controller.getJogadores() == 1) {
+            	System.out.print("Jogador " + jogador.getCor() + " ganhou!!");
+            	return;
+            }
             controller.proximoJogador();
         }
     }

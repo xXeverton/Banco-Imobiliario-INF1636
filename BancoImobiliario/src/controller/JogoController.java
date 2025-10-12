@@ -26,6 +26,10 @@ public class JogoController {
     public void adicionarJogador(Jogador jogador) {
         jogadores.add(jogador);
     }
+    
+    public int getJogadores() {
+    	return jogadores.size();
+    }
 
     public int lancarDados() {
     	ArrayList<Integer> valores = dado.lancarDados();
