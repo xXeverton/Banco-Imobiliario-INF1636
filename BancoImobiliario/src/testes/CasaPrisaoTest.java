@@ -5,32 +5,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 import game.CasaPrisao;
-import game.Jogador;
+import game.TipoCasa;
 
-public class CasaPrisaoTest {
 
-    private Jogador jogadorVisitante;
-    private CasaPrisao casaPrisao;
 
+public class CasaPrisaoTest{
+
+    private CasaPrisao casa;
 
     @Before
     public void setUp() {
-        casaPrisao = new CasaPrisao(); // Apenas cria a casa
-        jogadorVisitante = new Jogador(1, "Laranja"); // Cria um jogador que está visitando
+        casa = new CasaPrisao();  
     }
 
     @Test
-    public void testaStatusPresoNaoMudaParaVisitante() {
-        assertFalse("O jogador deveria continuar livre (isPreso() == false) ao visitar a prisão.",
-                    jogadorVisitante.isPreso());
-    }
-
-    @Test
-    public void testaSaldoNaoMudaParaVisitante() {
-        double saldoAntes = jogadorVisitante.getDinheiro();
-        double saldoDepois = jogadorVisitante.getDinheiro();
-        
-        assertEquals("O saldo do jogador não deveria mudar ao visitar a prisão.",
-                saldoAntes, saldoDepois, 0.001);
+    public void testaTipo() {
+    	assertEquals(TipoCasa.PRISAO, casa.getTipo());
     }
 }

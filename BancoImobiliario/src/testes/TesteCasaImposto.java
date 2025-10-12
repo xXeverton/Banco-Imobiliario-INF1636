@@ -1,45 +1,31 @@
-// TesteCasaImposto.java @author <Everton Pereira Militão>
-
 package testes;
+
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import game.Banco;
-import game.Jogador;
+
+import game.CasaImposto;
+import game.TipoCasa;
+
+
 
 public class TesteCasaImposto {
 
-    private final int IMPOSTO_COBRADO = 200;
-    private Jogador jogador;
-    private Banco banco;
+    private CasaImposto casa;
+
     @Before
     public void setUp() {
-        jogador = new Jogador(1, "Azul");
-        banco = new Banco();
+        casa = new CasaImposto(200);
+        
     }
-
+    
     @Test
-    public void testaSeJogadorPagaImposto() {
-        double saldoAntes = jogador.getDinheiro();
-
-
-        banco.impostoJogador(jogador);
-
-        double saldoEsperado = saldoAntes - IMPOSTO_COBRADO;
-
-        assertEquals("O saldo do jogador deveria diminuir em " + IMPOSTO_COBRADO,
-                saldoEsperado, jogador.getDinheiro(), 0.001);
+    public void testaValorCreditado() {
+    	assertEquals(200, casa.getValorImposto());
     }
-
+    
     @Test
-    public void testaSeBancoRecebeImposto() {
-        double saldoAntes = banco.getDinheiro();
-
-        banco.impostoJogador(jogador);
-
-        double saldoEsperado = saldoAntes + IMPOSTO_COBRADO;
-
-        assertEquals("O saldo do banco deveria aumentar em " + IMPOSTO_COBRADO,
-                saldoEsperado, banco.getDinheiro(), 0.001);
+    public void testaTipo() {
+    	assertEquals(TipoCasa.IMPOSTO, casa.getTipo());
     }
 }

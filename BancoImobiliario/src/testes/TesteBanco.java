@@ -5,7 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import game.*;
+
+import game.Banco;
+import game.Jogador;
+import game.CardPropriedade;
+import game.CardCompanhia;
 
 public class TesteBanco {
 
