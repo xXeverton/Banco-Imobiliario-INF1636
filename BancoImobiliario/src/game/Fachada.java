@@ -110,6 +110,11 @@ public class Fachada {
         j.setPreso(true);
     }
     
+    public boolean jogadorIsPreso() {
+    	Jogador j = getJogadorAtual();
+    	return j.isPreso();
+    }
+    
     public void processarRodadaPrisao(){
         Jogador jogador = getJogadorAtual();
         if (jogador.isPreso()) {
