@@ -25,11 +25,11 @@ public class JogoController {
     	return f.getCorJogadorAtual();
     }
 
-    public int lancarDados() {
+    public ArrayList<Integer> lancarDados() {
     	ArrayList<Integer> valores = f.lancarDados();
-    	int resultado = valores.get(0) + valores.get(1);
+    	
         System.out.println("Jogador " + f.getJogadorAtual() + " tirou " + valores.get(0) + "," + valores.get(1));
-        return resultado;
+        return valores;
     }
 
     // Deslocar o jogador da vez
