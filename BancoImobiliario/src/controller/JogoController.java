@@ -20,6 +20,10 @@ public class JogoController {
     public int getJogadores() {
     	return f.getNumeroJogadores();
     }
+    
+    public String getCorJogadorAtual() {
+    	return f.getCorJogadorAtual();
+    }
 
     public int lancarDados() {
     	ArrayList<Integer> valores = f.lancarDados();
@@ -132,6 +136,11 @@ public class JogoController {
 //    }
 
     // Prisão
+    
+    public boolean verificaPrisao() {
+    	return f.jogadorIsPreso();
+    }
+    
     public void processarPrisao() {
         f.processarRodadaPrisao();
     }
