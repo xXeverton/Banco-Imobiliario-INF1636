@@ -11,6 +11,7 @@ public class Jogador {
 	private String cor;
 	private int rodadasPreso;
 	private int posicao;
+    private int cartasSaidaLivrePrisao; // para contar quantas cartas o jogador possui
 
 	public Jogador(int numero_jogador, String cor) {
 		this.numero_jogador = numero_jogador;
@@ -20,6 +21,7 @@ public class Jogador {
         this.preso = false;
         this.cor = cor;
         this.posicao = 0;
+        this.cartasSaidaLivrePrisao = 0; 
 	}
 	
 	public String getCor() {
@@ -62,6 +64,27 @@ public class Jogador {
 		this.dinheiro = this.dinheiro + valor;
 	}
 	
+    // NOVO: Adiciona uma carta "Saída Livre da Prisão"
+    public void adicionarCartaSaidaLivrePrisao() {
+        this.cartasSaidaLivrePrisao++;
+    }
+
+    // NOVO: Verifica se o jogador possui a carta
+    public boolean temCartaSaidaLivrePrisao() {
+        return this.cartasSaidaLivrePrisao > 0;
+    }
+
+    // NOVO: Usa a carta para sair da prisão
+    public boolean usarCartaSaidaLivrePrisao() {
+        if (this.cartasSaidaLivrePrisao > 0) {
+            this.cartasSaidaLivrePrisao--;
+            this.setPreso(false);
+            this.setRodadasPreso(0);
+            return true;
+        }
+        return false;
+    }
+    
 	public boolean comprarTitulo(CardTitulo titulo) {
 	    if (this.dinheiro < titulo.getValor()) {
 	        System.out.println("Jogador não possui dinheiro suficiente");

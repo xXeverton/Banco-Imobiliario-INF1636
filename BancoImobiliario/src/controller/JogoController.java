@@ -1,22 +1,78 @@
 package controller;
 
 import game.Fachada;
+import game.JogoObserver; // Importa a interface Observer
+import game.CartaSorteReves; // Necessário para processar o objeto de notificação
+import game.TipoAcaoCarta; // Necessário para verificar o tipo de ação da carta
+import game.Jogador; // Necessário para checar tipos de notificação
 
+import view.JogoView; // Referência à View
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane; // Controller é responsável por mensagens
 
-public class JogoController {
+// O Controller implementa JogoObserver para receber notificações da Fachada
+public class JogoController implements JogoObserver {
     private Fachada f;
+    private JogoView view; // Referência à View para delegar a renderização
 
-    public JogoController() {
+    /**
+     * Construtor que inicializa a Fachada e registra o Controller como Observer.
+     * @param view A JogoView principal do jogo.
+     */
+    public JogoController(JogoView view) {
         this.f = Fachada.getInstancia();  // Singleton
+        this.view = view;
+        this.f.addObserver(this); // O Controller se registra como Observer na Fachada
     }
+    
+    // =======================================================
+    // MÉTODO DE OBSERVER (Recebe notificação do Model)
+    // =======================================================
+    @Override
+    public void update(Fachada observable, Object arg) {
+        
+        // 1. Trata a notificação de uma Carta Sorte/Revés
+        if (arg instanceof CartaSorteReves carta) {
+            // Exibir a descrição no Controller (responsável por JOptionPane)
+            JOptionPane.showMessageDialog(null,
+                                          carta.getDescricao(),
+                                          "Sorte ou Revés!",
+                                          JOptionPane.INFORMATION_MESSAGE);
+            
+            // Repassa a carta para a View exibir a imagem (renderização)
+            this.view.receberUpdate(carta); 
+
+            // Se a carta for IR_PARA_PRISAO, o turno deve ser encerrado
+            if (carta.getAcao() == TipoAcaoCarta.IR_PARA_PRISAO) {
+                this.proximaRodada();
+            }
+        } 
+        
+        // 2. Trata a notificação de um Jogador (saldo, posição, estado de prisão, etc.)
+        else if (arg instanceof Jogador jogador) {
+             // Repassa o objeto Jogador para a View atualizar o placar e o pião
+            this.view.receberUpdate(jogador);
+        }
+        
+        // 3. Trata a notificação dos Dados (ArrayList<Integer>)
+        else if (arg instanceof ArrayList<?> valoresDados) {
+             // Repassa os valores para a View atualizar a imagem dos dados
+             this.view.receberUpdate(valoresDados);
+        }
+        
+        // Outros argumentos (Falência, Propriedade, etc.) seriam tratados aqui.
+    }
+
+
+    // =======================================================
+    // MÉTODOS DE CONTROLE (Ações do Usuário)
+    // =======================================================
 
     public void adicionarJogador(int numero, String cor) {
         f.adicionarJogador(numero, cor);
     }
 
-    
     public int getJogadores() {
     	return f.getNumeroJogadores();
     }
@@ -28,14 +84,13 @@ public class JogoController {
     public ArrayList<Integer> lancarDados() {
     	ArrayList<Integer> valores = f.lancarDados();
     	
-        System.out.println("Jogador " + f.getJogadorAtual() + " tirou " + valores.get(0) + "," + valores.get(1));
+        System.out.println("Jogador " + f.getJogadorAtual().getCor() + " tirou " + valores.get(0) + "," + valores.get(1));
         return valores;
     }
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {
-        // Pede pra fachada mover o jogador e retorna o tipo da casa
-        var tipo = f.moverJogador(casas); // Novo método na Fachada
+        var tipo = f.moverJogador(casas); 
 
         switch (tipo) {
             case PARTIDA:
@@ -49,12 +104,14 @@ public class JogoController {
 
             case VA_PARA_PRISAO:
                 System.out.println("Você foi preso!");
-                f.prenderJogador();
+                f.prenderJogador(); // Move para a prisão e notifica
+                this.proximaRodada(); // Pula o turno
                 break;
 
             case SORTE_REVES:
                 System.out.println("Comprando carta Sorte ou Revés...");
-                f.comprarCartaSorteReves();
+                // A Fachada processa a lógica e notifica o resultado, que é tratado no update()
+                f.processarCartaSorteReves(); 
                 break;
 
             case IMPOSTO:
@@ -68,74 +125,34 @@ public class JogoController {
                 break;
 
             case TITULO:
-            	  f.pagarAluguel(casas);
-//                f.processarTituloCasaAtual();
+            	f.pagarAluguel(casas);
                 break;
 
             default:
                 System.out.println("Casa livre, nada acontece.");
                 break;
         }
+        
+        f.verificarFalencia();
     }
 
-//    public void comprarTitulo(CardTitulo titulo) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.venderTituloParaJogador(jogadorAtual, titulo);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() + 
-//                               " comprou o título " + titulo.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() + 
-//                               " não conseguiu comprar o título " + titulo.getNome());
-//        }
-//    }
-
-//    // Construir casa
-//    public void construirCasa(CardPropriedade propriedade) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.construirCasaParaJogador(jogadorAtual, propriedade);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " construiu em " + propriedade.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " não conseguiu construir em " + propriedade.getNome());
-//        }
-//    }
+    // =======================================================
+    // LÓGICA DE PRISÃO (Ações do Jogador)
+    // =======================================================
     
-//    // Construir hotel
-//    public void construirHotel(CardPropriedade propriedade) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.construirHotelParaJogador(jogadorAtual, propriedade);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " construiu em " + propriedade.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " não conseguiu construir em " + propriedade.getNome());
-//        }
-//    }
-
-    // Pagar aluguel
-//    public void pagarAluguel(CardPropriedade prop, int valorDados) {
-//        Jogador j = getJogadorAtual();
-//        Jogador dono = prop.getDono();
-//
-//        if (dono != null && dono != j && (prop.getCasas() > 0 || prop.isHotel())) {
-//            int aluguel = prop.calcularAluguel(valorDados);
-//            j.debito(aluguel);  
-//            dono.credito(aluguel); 
-//            System.out.println(j.getCor() + " pagou aluguel de " + aluguel + " a " + dono.getCor());
-//        }
-//    }
-
-    // Prisão
+    // Novo método de controle para uso da carta (chamado pela View/Listener)
+    public void tentarUsarCartaSaidaLivre() {
+        if (f.getJogadorAtual().temCartaSaidaLivrePrisao()) {
+             int resposta = JOptionPane.showConfirmDialog(null, 
+                "Deseja usar sua carta 'Saída Livre da Prisão'?", 
+                "Prisão", JOptionPane.YES_NO_OPTION);
+            
+            if (resposta == JOptionPane.YES_OPTION) {
+                // A Fachada executa a lógica e notifica a View sobre a soltura e a perda da carta
+                f.usarCartaSaidaLivreDaPrisao(); 
+            }
+        }
+    }
     
     public boolean verificaPrisao() {
     	return f.jogadorIsPreso();

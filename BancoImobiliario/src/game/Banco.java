@@ -21,6 +21,22 @@ public class Banco {
 		this.dinheiro += 200;
 	}
 	
+    // NOVO: Transfere um valor variável do Banco para o Jogador (usado nas Cartas Sorte)
+    public void transferirDoBanco(Jogador jogador, int valor) {
+        if (valor > 0) {
+            jogador.credito(valor);
+            this.dinheiro -= valor;
+        }
+    }
+    
+    // NOVO: Transfere um valor variável do Jogador para o Banco (usado nas Cartas Revés)
+    public void transferirParaBanco(Jogador jogador, int valor) {
+        if (valor > 0) {
+            jogador.debito(valor);
+            this.dinheiro += valor;
+        }
+    }
+    
 	public boolean venderTituloParaJogador(Jogador jogador, CardTitulo titulo) {
 	    if (titulo.podeSerCompradoPor(jogador)) {
 	    	if (jogador.comprarTitulo(titulo));

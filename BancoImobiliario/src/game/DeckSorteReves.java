@@ -92,6 +92,22 @@ class DeckSorteReves {
             ((LinkedList<CartaSorteReves>) cartas).addLast(carta);
         }
     }
+    
+     /**
+     * Recria e adiciona a carta "Saída Livre da Prisão" de volta ao deck.
+     * Chamado quando um jogador a utiliza para sair da prisão.
+     */
+    public void devolverCartaSaidaLivre() {
+        // A Carta Saída Livre da Prisão é a de ID 9, valor 0.
+        CartaSorteReves cartaSaidaLivre = new CartaSorteReves(
+            "Saída livre da prisão.", 
+            TipoAcaoCarta.SAIDA_LIVRE_PRISAO, 
+            0, 
+            9
+        );
+        devolverCarta(cartaSaidaLivre);
+        System.out.println("A carta Saída Livre da Prisão (ID 9) foi devolvida ao deck.");
+    }
 
      /**
      * Retorna o número de cartas restantes no deck. (Opcional)

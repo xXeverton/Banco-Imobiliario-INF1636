@@ -14,10 +14,13 @@ public class TabuleiroView extends JPanel {
     private static final long serialVersionUID = 1L;
     private BufferedImage imagemTabuleiro;
     private BufferedImage dado1Img, dado2Img;
+    private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
+    private boolean exibirCarta = false;      // NOVO CAMPO: Flag para desenhar a carta
+
     private Tabuleiro tabuleiro;
     private List<BufferedImage> imagensPinos;
     private List<Point> posicoesPinos;
-    private int[] posicaoAtual;
+    private int[] posicaoAtual; // Armazena a posição absoluta (0 a 39)
     private Color corJogadorAtual = Color.RED;
     
     private int valorDado1 = 1;
@@ -31,6 +34,7 @@ public class TabuleiroView extends JPanel {
 
     private void carregarImagens() {
         try {
+            // Carrega imagens iniciais
             imagemTabuleiro = ImageIO.read(getClass().getResource("/view/imagens/tabuleiro.png"));
             dado1Img = ImageIO.read(getClass().getResource("/view/imagens/dados/die_face_1.png"));
             dado2Img = ImageIO.read(getClass().getResource("/view/imagens/dados/die_face_1.png"));
@@ -77,12 +81,30 @@ public class TabuleiroView extends JPanel {
         repaint();
     }
 
-    public void moverPino(int indice, int casas) {
+    /**
+     * NOVO: Recebe a posição ABSOLUTA do Model (via Observer) e atualiza o pino.
+     * @param indice Índice do pino (0-based).
+     * @param novaPosicao Posição absoluta (0 a 39).
+     */
+    public void setPosicaoPino(int indice, int novaPosicao) {
         if (posicoesPinos == null || indice >= posicoesPinos.size()) return;
 
-        int posicao = (posicaoAtual[indice] + casas) % 40;
-        posicaoAtual[indice] = posicao;
+        // Atualiza a posição no array interno
+        posicaoAtual[indice] = novaPosicao;
 
+        // Calcula as novas coordenadas X/Y
+        calcularCoordenadasPino(indice, novaPosicao);
+        
+        repaint();
+    }
+
+    /**
+     * MoverPino antigo, reescrito para calcular as coordenadas X/Y
+     * baseado na posição absoluta.
+     */
+    private void calcularCoordenadasPino(int indice, int posicao) {
+        // Lógica de cálculo X/Y transferida e adaptada para usar 'posicao' absoluta
+        
         int lado = posicao / 10;
         int offset = posicao % 10;
 
@@ -161,9 +183,18 @@ public class TabuleiroView extends JPanel {
         y = y - (linha * espacamento);
         
         posicoesPinos.set(indice, new Point(x, y));
-        repaint();
     }
     
+    // Método antigo (moverPino) removido ou adaptado.
+    // O código anterior contia:
+    // public void moverPino(int indice, int casas) { 
+    //     // ... cálculo interno de posicao ...
+    //     posicaoAtual[indice] = posicao;
+    //     calcularCoordenadasPino(indice, posicao);
+    //     repaint();
+    // }
+    // O método 'setPosicaoPino' o substitui e é o que o Observer deve chamar.
+
     /** Simula o lançamento dos dois dados */
     public void atualizarDados(int dado1, int dado2) {
         valorDado1 = dado1;
@@ -184,6 +215,30 @@ public class TabuleiroView extends JPanel {
     public void setCorJogadorAtual(Color cor) {
         this.corJogadorAtual = cor;
         repaint(); // redesenha a área dos dados com a nova cor
+    }
+    
+    /**
+     * NOVO: Carrega e marca a carta para ser exibida.
+     * @param idImagem ID da carta (1 a 30).
+     */
+    public void exibirCarta(int idImagem) {
+        try {
+            // Carrega a imagem da carta Sorte/Revés (chance1.png a chance30.png)
+            imagemCartaSorteada = ImageIO.read(getClass().getResource("/view/imagens/sorteReves/chance" + idImagem + ".png"));
+            exibirCarta = true;
+            repaint();
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println("Erro ao carregar imagem da carta ID " + idImagem + ": " + e.getMessage());
+            imagemCartaSorteada = null;
+        }
+    }
+
+    /**
+     * NOVO: Oculta a carta (após o Timer da JogoView expirar).
+     */
+    public void ocultarCarta() {
+        exibirCarta = false;
+        repaint();
     }
     
     @Override
@@ -220,6 +275,18 @@ public class TabuleiroView extends JPanel {
                     g2d.drawImage(pino, p.x, p.y, 30, 30, this);
                 }
             }
+        }
+
+        // --- NOVO: Desenha a carta no centro (Java2D) ---
+        if (exibirCarta && imagemCartaSorteada != null) {
+            int cardWidth = 300;
+            int cardHeight = 450;
+            // Centraliza a carta no painel TabuleiroView
+            int x = (getWidth() - cardWidth) / 2; 
+            int y = (getHeight() - cardHeight) / 2;
+            
+            // Desenha a imagem da carta
+            g2d.drawImage(imagemCartaSorteada, x, y, cardWidth, cardHeight, this);
         }
 
         g2d.dispose();
