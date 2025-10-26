@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Point;
-import game.Tabuleiro;
 
 public class TabuleiroView extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -17,7 +16,6 @@ public class TabuleiroView extends JPanel {
     private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
     private boolean exibirCarta = false;      // NOVO CAMPO: Flag para desenhar a carta
 
-    private Tabuleiro tabuleiro;
     private List<BufferedImage> imagensPinos;
     private List<Point> posicoesPinos;
     private int[] posicaoAtual; // Armazena a posição absoluta (0 a 39)
@@ -27,7 +25,6 @@ public class TabuleiroView extends JPanel {
     private int valorDado2 = 1;
 
     public TabuleiroView() {
-        this.tabuleiro = new Tabuleiro();
         setBackground(new Color(230, 230, 230));
         carregarImagens();
     }
@@ -49,7 +46,7 @@ public class TabuleiroView extends JPanel {
         posicoesPinos = new ArrayList<>();
 
         // posição base (canto inferior direito, casa inicial)
-        int baseX = 1125;
+        int baseX = 985;
         int baseY = 605;
 
         int espacamento = 25;
@@ -114,7 +111,7 @@ public class TabuleiroView extends JPanel {
         // Define as bases de cada lado conforme suas anotações
         switch (lado) {
             case 0: // Base inferior (direita → esquerda)
-                x = 1125;
+                x = 985;
                 y = 605;
                 primeiroPasso = 70;
                 passo = 55;
@@ -127,7 +124,7 @@ public class TabuleiroView extends JPanel {
                 break;
 
             case 1: // Lado esquerdo (baixo → cima)
-                x = 530;
+                x = 380;
                 y = 600;
                 primeiroPasso = 70;
                 passo = 47;
@@ -140,9 +137,9 @@ public class TabuleiroView extends JPanel {
                 break;
 
             case 2: // Topo (esquerda → direita)
-                x = 545;
+                x = 405;
                 y = 110;
-                primeiroPasso = 65;
+                primeiroPasso = 70;
                 passo = 55;
                 if (offset == 0) {
                 } else if (offset == 1) {
@@ -153,7 +150,7 @@ public class TabuleiroView extends JPanel {
                 break;
 
             case 3: // Lado direito (cima → baixo)
-                x = 1115;
+                x = 985;
                 y = 100;
                 primeiroPasso = 60;
                 passo = 46;
@@ -248,22 +245,22 @@ public class TabuleiroView extends JPanel {
 
         // --- Desenha o tabuleiro ---
         if (imagemTabuleiro != null) {
-            int x = (getWidth() - 575);
+            int x = (getWidth() - 425);
             int y = (getHeight() - 140);
-            g2d.drawImage(imagemTabuleiro, 520, 60, x, y, this);
+            g2d.drawImage(imagemTabuleiro, 370, 60, x, y, this);
         }
         // --- Desenha a área dos dados à esquerda ---
         g2d.setColor(new Color(240, 240, 240));
-        g2d.fillRoundRect(130, 60, 240, 120, 20, 20);
+        g2d.fillRoundRect(60, 60, 240, 120, 20, 20);
         
         g2d.setStroke(new BasicStroke(3));
         g2d.setColor(corJogadorAtual);
-        g2d.drawRoundRect(130, 60, 240, 120, 20, 20);
+        g2d.drawRoundRect(60, 60, 240, 120, 20, 20);
         
         // --- Desenha os dados ---
         if (dado1Img != null && dado2Img != null) {
-            g2d.drawImage(dado1Img, 160, 80, 80, 80, this);
-            g2d.drawImage(dado2Img, 260, 80, 80, 80, this);
+            g2d.drawImage(dado1Img, 90, 80, 80, 80, this);
+            g2d.drawImage(dado2Img, 190, 80, 80, 80, this);
         }
 
         // --- Desenha os pinos ---
