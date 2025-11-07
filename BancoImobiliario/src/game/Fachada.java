@@ -1,10 +1,11 @@
 package game;
-
+import game.observer.Observavel;
+import eventos.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Fachada {
+public class Fachada extends Observavel {
 
     private static Fachada instancia;
     private Banco banco;
@@ -13,6 +14,7 @@ public class Fachada {
     private List<Jogador> jogadores;
     private int indiceJogadorAtual;
     private Casa casaAtual;
+    private DeckSorteReves deckSorteReves; 
 
     private Fachada() {
         this.banco = new Banco();
@@ -20,6 +22,7 @@ public class Fachada {
         this.dado = new Dado();
         this.jogadores = new ArrayList<>();
         this.indiceJogadorAtual = 0;
+        this.deckSorteReves = new DeckSorteReves();
     }
 
     // === SINGLETON ===
@@ -65,7 +68,26 @@ public class Fachada {
         this.casaAtual = tabuleiro.moverJogador(j, casas);
         return this.casaAtual.getTipo();
     }
-
+    
+    public void notificarCartaCasa() {
+    	Casa casa = this.casaAtual;
+    	if (casa instanceof CardTitulo titulo) {
+        	if (titulo.getIdImage()== -1) {
+        		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome());
+        		notificarObservadores(evento);
+        	} else {
+        		EventoExibirCarta evento = new EventoExibirCarta(3, titulo.getIdImage(), titulo.getNome());
+        		notificarObservadores(evento);
+        	}
+        }
+    }
+    
+    public void notificarCartaSorteReves() {
+        CartaSorteReves carta = this.deckSorteReves.tirarCarta();
+        EventoExibirCartaSorteReves evento = new EventoExibirCartaSorteReves(carta);
+        notificarObservadores(evento); // Método do Observável
+    }
+    
     // === DADO ===
     public ArrayList<Integer> lancarDados() {
         return dado.lancarDados();

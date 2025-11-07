@@ -8,23 +8,22 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Point;
-import game.Tabuleiro;
 
 public class TabuleiroView extends JPanel {
     private static final long serialVersionUID = 1L;
     private BufferedImage imagemTabuleiro;
     private BufferedImage dado1Img, dado2Img;
-    private Tabuleiro tabuleiro;
     private List<BufferedImage> imagensPinos;
     private List<Point> posicoesPinos;
     private int[] posicaoAtual;
     private Color corJogadorAtual = Color.RED;
+    private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
+    private boolean exibirCarta = false; 
     
     private int valorDado1 = 1;
     private int valorDado2 = 1;
 
     public TabuleiroView() {
-        this.tabuleiro = new Tabuleiro();
         setBackground(new Color(230, 230, 230));
         carregarImagens();
     }
@@ -181,6 +180,45 @@ public class TabuleiroView extends JPanel {
         }
     }
     
+    public void exibirCarta(int tipo,int idImagem, String nome) { // Recebe int para Sorte/Reves ou Companhia e Nome para propriedade
+    	if (tipo == 1) {
+	        try {
+	            // Carrega a imagem da carta Sorte/Revés (chance1.png a chance30.png)
+	            imagemCartaSorteada = ImageIO.read(getClass().getResource("/view/imagens/sorteReves/chance" + idImagem + ".png"));
+	            exibirCarta = true;
+	            repaint();
+	        } catch (IOException | IllegalArgumentException e) {
+	            System.err.println("Erro ao carregar imagem da carta ID " + idImagem + ": " + e.getMessage());
+	            imagemCartaSorteada = null;
+	        }
+    	} else if(tipo == 2) {
+	        try {
+	            // Carrega a imagem da carta Propriedade (nome da propriedade)
+	            imagemCartaSorteada = ImageIO.read(getClass().getResource("/view/imagens/territorios/" + nome + ".png"));
+	            exibirCarta = true;
+	            repaint();
+	        } catch (IOException | IllegalArgumentException e) {
+	            System.err.println("Erro ao carregar imagem de carta com nome " + nome + ": " + e.getMessage());
+	            imagemCartaSorteada = null;
+	        } 
+    	} else {
+	        try {
+	            // Carrega a imagem da carta Companhia (company1.png a company6.png)
+	            imagemCartaSorteada = ImageIO.read(getClass().getResource("/view/imagens/companhias/company" + idImagem + ".png"));
+	            exibirCarta = true;
+	            repaint();
+	        } catch (IOException | IllegalArgumentException e) {
+	            System.err.println("Erro ao carregar imagem da carta ID " + idImagem + ": " + e.getMessage());
+	            imagemCartaSorteada = null;
+	        }
+    	}
+    }
+    
+    public void ocultarCarta() {
+        exibirCarta = false;
+        repaint();
+    }
+    
     public void setCorJogadorAtual(Color cor) {
         this.corJogadorAtual = cor;
         repaint(); // redesenha a área dos dados com a nova cor
@@ -220,6 +258,17 @@ public class TabuleiroView extends JPanel {
                     g2d.drawImage(pino, p.x, p.y, 30, 30, this);
                 }
             }
+        }
+        
+        if (exibirCarta && imagemCartaSorteada != null) {
+            int cardWidth = 300;
+            int cardHeight = 450;
+            // Centraliza a carta no painel TabuleiroView
+            int x = (getWidth() - cardWidth) / 2; 
+            int y = (getHeight() - cardHeight) / 2;
+            
+            // Desenha a imagem da carta
+            g2d.drawImage(imagemCartaSorteada, x, y, cardWidth, cardHeight, this);
         }
 
         g2d.dispose();

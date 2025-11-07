@@ -15,7 +15,7 @@ public class TesteCard {
     @Before
     public void setUp() {
         prop = new CardPropriedade("Copacabana", 1000, 200, 500, new int[]{50, 100, 150, 200, 250, 300});
-        comp = new CardCompanhia("Companhia de Luz", 800, 50);
+        comp = new CardCompanhia("Companhia de Luz", 800, 50,8);
     }
 
     // --- TESTES DE CONSTRUÇÃO DE CASAS ---

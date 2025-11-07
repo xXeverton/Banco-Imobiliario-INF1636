@@ -1,12 +1,14 @@
 package view;
+import eventos.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 import controller.JogoController;
+import game.observer.*;
 
-public class JogoView extends JFrame {
+public class JogoView extends JFrame implements Observador{
 
     private static final long serialVersionUID = 1L;
     private final JogoController controller = new JogoController();
@@ -40,7 +42,47 @@ public class JogoView extends JFrame {
 
         setVisible(true);
         
+        controller.adicionarObservador(this);
         this.iniciarJogo();
+    }
+    
+    @Override
+    public void atualizar(EventoJogo evento) {
+        switch (evento.getTipo()) {
+            case "EXIBIR_CARTA" -> {
+                int tipo = (int) evento.get("tipoCarta");
+                int idImg = (int) evento.get("idImagem");
+                String nome = (String) evento.get("nome");
+                exibirCarta(tipo, idImg, nome);
+            }
+            case "EXIBIR_CARTA_SORTE_REVES" -> {
+                int idImg = (int) evento.get("idImagem");
+                String descricao = (String) evento.get("descricao");
+
+                // Chama seu método que exibe a carta na tela
+                exibirCarta(1, idImg, descricao); // tipo=1 indica Sorte/Reves
+            }
+            default -> System.out.println("Evento não tratado: " + evento);
+        }
+    }
+
+    public void exibirCarta(int tipo, int idImagem, String nome) {
+        // Assume que TabuleiroView.exibirCarta() foi criado para carregar e desenhar a imagem
+        if(tipo == 1) {
+        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
+        } else if (tipo == 2){
+        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
+        } else {
+        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
+        }
+        // Adiciona um pequeno delay para que o usuário possa ler a carta
+        Timer timer = new Timer(3000, e -> {
+            // Assume que TabuleiroView.ocultarCarta() foi criado
+            tabuleiroView.ocultarCarta(); 
+            ((Timer)e.getSource()).stop();
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
     
     private void iniciarJogo() {
