@@ -24,7 +24,7 @@ public class TesteBanco {
 
     private static class FakeCompanhia extends CardCompanhia {
         public FakeCompanhia(String nome, int valor, int precoUso) {
-            super(nome, valor, precoUso);
+            super(nome, valor, precoUso, 8);
         }
     }
 

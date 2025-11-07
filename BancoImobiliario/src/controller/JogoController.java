@@ -1,7 +1,7 @@
 package controller;
 
 import game.Fachada;
-
+import game.observer.*;
 
 import java.util.ArrayList;
 
@@ -10,6 +10,10 @@ public class JogoController {
 
     public JogoController() {
         this.f = Fachada.getInstancia();  // Singleton
+    }
+    
+    public void adicionarObservador(Observador o) {
+    	this.f.adicionarObservador(o);
     }
 
     public void adicionarJogador(int numero, String cor) {
@@ -54,6 +58,7 @@ public class JogoController {
 
             case SORTE_REVES:
                 System.out.println("Comprando carta Sorte ou Revés...");
+                f.notificarCartaSorteReves();
                 f.comprarCartaSorteReves();
                 break;
 
@@ -68,6 +73,7 @@ public class JogoController {
                 break;
 
             case TITULO:
+            	  f.notificarCartaCasa();
             	  f.pagarAluguel(casas);
 //                f.processarTituloCasaAtual();
                 break;

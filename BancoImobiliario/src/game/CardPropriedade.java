@@ -8,7 +8,7 @@ public class CardPropriedade extends CardTitulo {
     private boolean hotel;
 
 	public CardPropriedade(String nome, int valor, int precoCasa, int precoHotel, int[] alugueis) {
-	    super(nome, valor);
+	    super(nome, valor, -1);
 	    this.precoCasa = precoCasa;
 	    this.precoHotel = precoHotel;
 	    this.alugueis = alugueis;
