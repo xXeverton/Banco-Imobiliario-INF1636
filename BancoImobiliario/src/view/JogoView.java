@@ -17,6 +17,8 @@ public class JogoView extends JFrame implements Observador{
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
+    private JPanel painelAcoesCarta = new JPanel();
+
 
     private int numJogadores;
     private int jogadorAtual = 0;
@@ -28,11 +30,23 @@ public class JogoView extends JFrame implements Observador{
         setLayout(new BorderLayout());
         add(tabuleiroView, BorderLayout.CENTER);
 
+        // 🔹 Painel dos botões principais
         JPanel painelBotoes = new JPanel();
         painelBotoes.add(btnLancarDados);
         painelBotoes.add(btnProximoJogador);
         painelBotoes.add(lblStatus);
-        add(painelBotoes, BorderLayout.SOUTH);
+
+        // 🔹 Painel de ações das cartas
+        painelAcoesCarta = new JPanel();
+        painelAcoesCarta.setLayout(new FlowLayout());
+        painelAcoesCarta.setVisible(true);
+
+        // 🔹 Painel inferior que agrupa ambos
+        JPanel painelInferior = new JPanel(new BorderLayout());
+        painelInferior.add(painelBotoes, BorderLayout.NORTH);
+        painelInferior.add(painelAcoesCarta, BorderLayout.SOUTH);
+
+        add(painelInferior, BorderLayout.SOUTH);
 
         setSize(1280, 800);
         setLocationRelativeTo(null);
@@ -53,37 +67,84 @@ public class JogoView extends JFrame implements Observador{
                 int tipo = (int) evento.get("tipoCarta");
                 int idImg = (int) evento.get("idImagem");
                 String nome = (String) evento.get("nome");
-                exibirCarta(tipo, idImg, nome);
+                boolean dono = (boolean) evento.get("dono");
+                exibirCarta(tipo, idImg, nome, dono);
             }
             case "EXIBIR_CARTA_SORTE_REVES" -> {
                 int idImg = (int) evento.get("idImagem");
                 String descricao = (String) evento.get("descricao");
 
                 // Chama seu método que exibe a carta na tela
-                exibirCarta(1, idImg, descricao); // tipo=1 indica Sorte/Reves
+                exibirCarta(1, idImg, descricao, true); // tipo=1 indica Sorte/Reves
             }
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
 
-    public void exibirCarta(int tipo, int idImagem, String nome) {
-        // Assume que TabuleiroView.exibirCarta() foi criado para carregar e desenhar a imagem
-        if(tipo == 1) {
-        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
-        } else if (tipo == 2){
-        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
+    public void exibirCarta(int tipo, int idImagem, String nome, boolean dono) {
+        // Exibe a carta visualmente no tabuleiro
+        tabuleiroView.exibirCarta(tipo, idImagem, nome);
+
+        // Remove qualquer botão antigo antes de adicionar novos
+        painelAcoesCarta.removeAll();
+        if (dono) {
+	        if (tipo != 1) { // Carta do tipo "Título"
+	            JButton btnComprar = new JButton("Comprar propriedade");
+	            JButton btnRecusar = new JButton("Recusar compra");
+	
+	            // Define ações dos botões
+	            btnComprar.addActionListener(e -> {
+	                controller.comprarTitulo(); // chama o método do controller
+	                tabuleiroView.ocultarCarta();
+	                painelAcoesCarta.removeAll();
+	                painelAcoesCarta.revalidate();
+	                painelAcoesCarta.repaint();
+	                btnProximoJogador.setEnabled(true);
+	            });
+	
+	            btnRecusar.addActionListener(e -> {
+	                controller.recusarCompra();
+	                tabuleiroView.ocultarCarta();
+	                painelAcoesCarta.removeAll();
+	                painelAcoesCarta.revalidate();
+	                painelAcoesCarta.repaint();
+	                btnProximoJogador.setEnabled(true);
+	            });
+	
+	            painelAcoesCarta.add(btnComprar);
+	            painelAcoesCarta.add(btnRecusar);
+	
+	            painelAcoesCarta.revalidate();
+	            painelAcoesCarta.repaint();
+	
+	            btnLancarDados.setEnabled(false); // desativa jogada até escolher ação
+	        } else {
+	            // Outros tipos de carta (Sorte/Reves, etc.)
+	            JButton btnOk = new JButton("OK");
+	            btnOk.addActionListener(e -> {
+	                tabuleiroView.ocultarCarta();
+	                painelAcoesCarta.removeAll();
+	                painelAcoesCarta.revalidate();
+	                painelAcoesCarta.repaint();
+	                btnProximoJogador.setEnabled(true);
+	            });
+	
+	            painelAcoesCarta.add(btnOk);
+	            painelAcoesCarta.revalidate();
+	            painelAcoesCarta.repaint();
+	
+	            btnLancarDados.setEnabled(false);
+	        }
         } else {
-        	tabuleiroView.exibirCarta(tipo, idImagem, nome);
+        	controller.pagarAluguel();
+        	tabuleiroView.ocultarCarta();
+            painelAcoesCarta.removeAll();
+            painelAcoesCarta.revalidate();
+            painelAcoesCarta.repaint();
+            btnProximoJogador.setEnabled(true);
         }
-        // Adiciona um pequeno delay para que o usuário possa ler a carta
-        Timer timer = new Timer(3000, e -> {
-            // Assume que TabuleiroView.ocultarCarta() foi criado
-            tabuleiroView.ocultarCarta(); 
-            ((Timer)e.getSource()).stop();
-        });
-        timer.setRepeats(false);
-        timer.start();
     }
+
     
     private void iniciarJogo() {
         numJogadores = 0;

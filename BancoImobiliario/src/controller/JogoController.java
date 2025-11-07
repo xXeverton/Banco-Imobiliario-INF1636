@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class JogoController {
     private Fachada f;
-
+    private int casas;
     public JogoController() {
         this.f = Fachada.getInstancia();  // Singleton
     }
@@ -38,6 +38,7 @@ public class JogoController {
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {
+    	this.casas = casas;
         // Pede pra fachada mover o jogador e retorna o tipo da casa
         var tipo = f.moverJogador(casas); // Novo método na Fachada
 
@@ -74,8 +75,6 @@ public class JogoController {
 
             case TITULO:
             	  f.notificarCartaCasa();
-            	  f.pagarAluguel(casas);
-//                f.processarTituloCasaAtual();
                 break;
 
             default:
@@ -84,19 +83,25 @@ public class JogoController {
         }
     }
 
-//    public void comprarTitulo(CardTitulo titulo) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.venderTituloParaJogador(jogadorAtual, titulo);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() + 
-//                               " comprou o título " + titulo.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() + 
-//                               " não conseguiu comprar o título " + titulo.getNome());
-//        }
-//    }
+    public void comprarTitulo() {
+    	boolean sucesso = f.processarTituloCasaAtual();
+    	
+        if (sucesso) {
+            System.out.println("Jogador " + f.getCorJogadorAtual() + 
+                               " comprou o título " + f.getNomeCasaAtual());
+        } else {
+            System.out.println("Jogador " + f.getCorJogadorAtual() + 
+                               " não conseguiu comprar o título " + f.getNomeCasaAtual());
+        }
+    }
+    
+    public void recusarCompra() {
+    	return;
+    }
+    
+    public void pagarAluguel() {
+  	  f.pagarAluguel(this.casas);
+    }
 
 //    // Construir casa
 //    public void construirCasa(CardPropriedade propriedade) {

@@ -71,12 +71,18 @@ public class Fachada extends Observavel {
     
     public void notificarCartaCasa() {
     	Casa casa = this.casaAtual;
+    	boolean dono;
     	if (casa instanceof CardTitulo titulo) {
+    		if (titulo.getDono() == null) {
+    			dono = true;
+    		} else {
+    			dono = false;
+    		}
         	if (titulo.getIdImage()== -1) {
-        		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome());
+        		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome(), dono);
         		notificarObservadores(evento);
         	} else {
-        		EventoExibirCarta evento = new EventoExibirCarta(3, titulo.getIdImage(), titulo.getNome());
+        		EventoExibirCarta evento = new EventoExibirCarta(3, titulo.getIdImage(), titulo.getNome(), dono);
         		notificarObservadores(evento);
         	}
         }
@@ -180,37 +186,26 @@ public class Fachada extends Observavel {
     
     // == TITULO ==
     
-    public void processarTituloCasaAtual(int valorDados) {
+    public String getNomeCasaAtual(){
+    	return this.casaAtual.getNome();
+    }
+    
+    public boolean processarTituloCasaAtual() {
+        Casa casa = this.casaAtual;
         Jogador j = getJogadorAtual();
-        Casa casa = tabuleiro.getCasa(j.getPosicao());
-
         if (casa instanceof CardTitulo prop) {
-            if (prop.getDono() == null) {
-            	// TRATAMENTO NO CONTROLLER
-                System.out.println("Essa propriedade está disponível para compra por R$" + prop.getValor());
-//                System.out.print("Deseja comprá-la? \n(1) sim \n(2) não\n");
-//                int resposta = scanner.nextInt();
-//                if (resposta == 1) {
-//                    if (banco.venderTituloParaJogador(j, prop)) {
-//                        prop.setDono(j);
-//                        System.out.println("Você comprou " + prop.getNome());
-//                    } else {
-//                        System.out.println("Você não tem dinheiro suficiente.");
-//                    }
-//                }
-            } else if (prop.getDono() != j) {
-                this.pagarAluguel(valorDados);
-            } else {
-            	// TRATAMENTO NO CONTROLLER
-//                if (prop instanceof CardPropriedade propriedade) {
-//                    System.out.println("Deseja construir? 1=casa 2=hotel 3=não");
-//                    int resp = scanner.nextInt();
-//                    if (resp == 1) banco.construirCasaParaJogador(j, propriedade);
-//                    if (resp == 2) banco.construirHotelParaJogador(j, propriedade);
-//                }
-            }
+        	if (j.getDinheiro()>prop.getValor()) {
+        		prop.setDono(j);
+        		j.debito(prop.getValor());
+        		return true;
+        	} else {
+        		return false;
+        	}
+        } else {
+        	return false;
         }
     }
+    
     
     
     public void pagarAluguel(int valorDados) {
@@ -219,7 +214,7 @@ public class Fachada extends Observavel {
         Jogador dono = casa.getDono();
     
         if (casa instanceof CardPropriedade propriedade) {
-	        if (dono != null && dono != j && (propriedade.getCasas() > 0 || propriedade.isHotel())) {
+	        if (dono != null && dono != j) {
 	            int aluguel = propriedade.calcularAluguel(valorDados);
 	            j.debito(aluguel);  
 	            dono.credito(aluguel); 
