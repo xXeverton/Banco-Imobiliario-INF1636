@@ -18,6 +18,7 @@ public class JogoView extends JFrame implements Observador{
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
     private JPanel painelAcoesCarta = new JPanel();
+    private JPanel painelBotoes = new JPanel();
 
 
     private int numJogadores;
@@ -31,7 +32,7 @@ public class JogoView extends JFrame implements Observador{
         add(tabuleiroView, BorderLayout.CENTER);
 
         // 🔹 Painel dos botões principais
-        JPanel painelBotoes = new JPanel();
+        
         painelBotoes.add(btnLancarDados);
         painelBotoes.add(btnProximoJogador);
         painelBotoes.add(lblStatus);
@@ -39,7 +40,7 @@ public class JogoView extends JFrame implements Observador{
         // 🔹 Painel de ações das cartas
         painelAcoesCarta = new JPanel();
         painelAcoesCarta.setLayout(new FlowLayout());
-        painelAcoesCarta.setVisible(true);
+        painelAcoesCarta.setVisible(false);
 
         // 🔹 Painel inferior que agrupa ambos
         JPanel painelInferior = new JPanel(new BorderLayout());
@@ -86,7 +87,12 @@ public class JogoView extends JFrame implements Observador{
         tabuleiroView.exibirCarta(tipo, idImagem, nome);
 
         // Remove qualquer botão antigo antes de adicionar novos
+        
+        painelBotoes.setVisible(false);
+        painelAcoesCarta.setVisible(true);
+        
         painelAcoesCarta.removeAll();
+        
         if (dono) {
 	        if (tipo != 1) { // Carta do tipo "Título"
 	            JButton btnComprar = new JButton("Comprar propriedade");
@@ -95,20 +101,12 @@ public class JogoView extends JFrame implements Observador{
 	            // Define ações dos botões
 	            btnComprar.addActionListener(e -> {
 	                controller.comprarTitulo(); // chama o método do controller
-	                tabuleiroView.ocultarCarta();
-	                painelAcoesCarta.removeAll();
-	                painelAcoesCarta.revalidate();
-	                painelAcoesCarta.repaint();
-	                btnProximoJogador.setEnabled(true);
+	                restaurarInterface();
 	            });
 	
 	            btnRecusar.addActionListener(e -> {
 	                controller.recusarCompra();
-	                tabuleiroView.ocultarCarta();
-	                painelAcoesCarta.removeAll();
-	                painelAcoesCarta.revalidate();
-	                painelAcoesCarta.repaint();
-	                btnProximoJogador.setEnabled(true);
+	                restaurarInterface();
 	            });
 	
 	            painelAcoesCarta.add(btnComprar);
@@ -122,11 +120,7 @@ public class JogoView extends JFrame implements Observador{
 	            // Outros tipos de carta (Sorte/Reves, etc.)
 	            JButton btnOk = new JButton("OK");
 	            btnOk.addActionListener(e -> {
-	                tabuleiroView.ocultarCarta();
-	                painelAcoesCarta.removeAll();
-	                painelAcoesCarta.revalidate();
-	                painelAcoesCarta.repaint();
-	                btnProximoJogador.setEnabled(true);
+	            	restaurarInterface();
 	            });
 	
 	            painelAcoesCarta.add(btnOk);
@@ -137,12 +131,19 @@ public class JogoView extends JFrame implements Observador{
 	        }
         } else {
         	controller.pagarAluguel();
-        	tabuleiroView.ocultarCarta();
-            painelAcoesCarta.removeAll();
-            painelAcoesCarta.revalidate();
-            painelAcoesCarta.repaint();
-            btnProximoJogador.setEnabled(true);
+        	restaurarInterface();
         }
+    }
+    
+    
+    // 🔹 Método auxiliar para limpar o painel e restaurar a interface normal
+    private void restaurarInterface() {
+        tabuleiroView.ocultarCarta();
+        painelAcoesCarta.removeAll();
+        painelAcoesCarta.setVisible(false);
+        painelBotoes.setVisible(true);
+        painelAcoesCarta.revalidate();
+        painelAcoesCarta.repaint();
     }
 
     
