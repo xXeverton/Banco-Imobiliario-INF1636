@@ -60,7 +60,6 @@ public class JogoController {
             case SORTE_REVES:
                 System.out.println("Comprando carta Sorte ou Revés...");
                 f.notificarCartaSorteReves();
-                f.comprarCartaSorteReves();
                 break;
 
             case IMPOSTO:
@@ -102,36 +101,38 @@ public class JogoController {
     public void pagarAluguel() {
   	  f.pagarAluguel(this.casas);
     }
-
-//    // Construir casa
-//    public void construirCasa(CardPropriedade propriedade) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.construirCasaParaJogador(jogadorAtual, propriedade);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " construiu em " + propriedade.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " não conseguiu construir em " + propriedade.getNome());
-//        }
-//    }
     
-//    // Construir hotel
-//    public void construirHotel(CardPropriedade propriedade) {
-//        Jogador jogadorAtual = getJogadorAtual();
-//
-//        boolean sucesso = banco.construirHotelParaJogador(jogadorAtual, propriedade);
-//
-//        if (sucesso) {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " construiu em " + propriedade.getNome());
-//        } else {
-//            System.out.println("Jogador " + jogadorAtual.getCor() +
-//                               " não conseguiu construir em " + propriedade.getNome());
-//        }
-//    }
+    public boolean verificaConstrucaoHotel() {
+    	return (!f.verificaConstrucaoHotel());
+    }
+
+    // Construir casa
+    public void construirCasa() {
+
+        boolean sucesso = f.construirCasaParaJogador();
+
+        if (sucesso) {
+            System.out.println("Jogador " + f.getCorJogadorAtual() +
+                               " construiu em " + f.getNomeCasaAtual());
+        } else {
+            System.out.println("Jogador " + f.getCorJogadorAtual() +
+                               " não conseguiu construir em " + f.getNomeCasaAtual());
+        }
+    }
+    
+    // Construir hotel
+    public void construirHotel() {
+    	
+        boolean sucesso = f.construirHotelParaJogador();
+
+        if (sucesso) {
+            System.out.println("Jogador " + f.getCorJogadorAtual() +
+                               " construiu em " + f.getNomeCasaAtual());
+        } else {
+            System.out.println("Jogador " + f.getCorJogadorAtual() +
+                               " não conseguiu construir em " + f.getNomeCasaAtual());
+        }
+    }
 
     // Pagar aluguel
 //    public void pagarAluguel(CardPropriedade prop, int valorDados) {

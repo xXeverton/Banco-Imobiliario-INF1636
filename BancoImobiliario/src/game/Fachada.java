@@ -71,18 +71,23 @@ public class Fachada extends Observavel {
     
     public void notificarCartaCasa() {
     	Casa casa = this.casaAtual;
-    	boolean dono;
+    	Jogador j = getJogadorAtual();
+    	boolean compra;
+    	boolean dono = false;
     	if (casa instanceof CardTitulo titulo) {
     		if (titulo.getDono() == null) {
-    			dono = true;
+    			compra = true;
     		} else {
-    			dono = false;
+    			compra = false;
+    			if (titulo.getDono() == j) {
+    				dono = true;
+    			}
     		}
         	if (titulo.getIdImage()== -1) {
-        		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome(), dono);
+        		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome(), compra, dono);
         		notificarObservadores(evento);
         	} else {
-        		EventoExibirCarta evento = new EventoExibirCarta(3, titulo.getIdImage(), titulo.getNome(), dono);
+        		EventoExibirCarta evento = new EventoExibirCarta(3, titulo.getIdImage(), titulo.getNome(), compra, dono);
         		notificarObservadores(evento);
         	}
         }
@@ -206,6 +211,16 @@ public class Fachada extends Observavel {
         }
     }
     
+    public boolean verificaConstrucaoHotel() {
+    	Casa casa = this.casaAtual;
+    	if (casa instanceof CardPropriedade prop) {
+    		if (prop.getCasas() > 0) {
+    			return prop.isHotel();
+    		}
+    	}
+    	return true;
+    }
+    
     
     
     public void pagarAluguel(int valorDados) {
@@ -231,9 +246,4 @@ public class Fachada extends Observavel {
         }
     }
     
-
-
-    public void comprarCartaSorteReves() {
-        // implementar depois
-    }
 }
