@@ -68,21 +68,22 @@ public class JogoView extends JFrame implements Observador{
                 int tipo = (int) evento.get("tipoCarta");
                 int idImg = (int) evento.get("idImagem");
                 String nome = (String) evento.get("nome");
+                boolean compra = (boolean) evento.get("compra");
                 boolean dono = (boolean) evento.get("dono");
-                exibirCarta(tipo, idImg, nome, dono);
+                exibirCarta(tipo, idImg, nome, compra, dono);
             }
             case "EXIBIR_CARTA_SORTE_REVES" -> {
                 int idImg = (int) evento.get("idImagem");
                 String descricao = (String) evento.get("descricao");
 
                 // Chama seu método que exibe a carta na tela
-                exibirCarta(1, idImg, descricao, true); // tipo=1 indica Sorte/Reves
+                exibirCarta(1, idImg, descricao, true, true); // tipo=1 indica Sorte/Reves
             }
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
 
-    public void exibirCarta(int tipo, int idImagem, String nome, boolean dono) {
+    public void exibirCarta(int tipo, int idImagem, String nome, boolean compra, boolean dono) {
         // Exibe a carta visualmente no tabuleiro
         tabuleiroView.exibirCarta(tipo, idImagem, nome);
 
@@ -93,7 +94,7 @@ public class JogoView extends JFrame implements Observador{
         
         painelAcoesCarta.removeAll();
         
-        if (dono) {
+        if (compra) {
 	        if (tipo != 1) { // Carta do tipo "Título"
 	            JButton btnComprar = new JButton("Comprar propriedade");
 	            JButton btnRecusar = new JButton("Recusar compra");
@@ -130,8 +131,40 @@ public class JogoView extends JFrame implements Observador{
 	            btnLancarDados.setEnabled(false);
 	        }
         } else {
-        	controller.pagarAluguel();
-        	restaurarInterface();
+        	if (dono & (tipo==2)) {
+        		
+        		if (controller.verificaConstrucaoHotel()) {
+        			JButton btnHotel = new JButton("Comprar hotel");
+    	            btnHotel.addActionListener(e -> {
+    	                controller.construirHotel(); // chama o método do controller
+    	                restaurarInterface();
+    	            });
+    	            painelAcoesCarta.add(btnHotel);
+        		}
+        		JButton btnCasa = new JButton("Comprar casa");
+	            JButton btnRecusar = new JButton("Recusar compra");
+	
+	            // Define ações dos botões
+	            btnCasa.addActionListener(e -> {
+	                controller.construirCasa(); // chama o método do controller
+	                restaurarInterface();
+	            });
+
+	            btnRecusar.addActionListener(e -> {
+	                controller.recusarCompra();
+	                restaurarInterface();
+	            });
+	            
+	            painelAcoesCarta.add(btnCasa);
+	            painelAcoesCarta.add(btnRecusar);
+	
+	            painelAcoesCarta.revalidate();
+	            painelAcoesCarta.repaint();
+	            
+        	} else {
+	        	controller.pagarAluguel();
+	        	restaurarInterface();
+        	}
         }
     }
     
