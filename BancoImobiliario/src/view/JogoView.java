@@ -79,6 +79,31 @@ public class JogoView extends JFrame implements Observador{
                 // Chama seu método que exibe a carta na tela
                 exibirCarta(1, idImg, descricao, true, true); // tipo=1 indica Sorte/Reves
             }
+            case "LANCAR_DADOS" -> {
+                int dado1 = (int) evento.get("dado1");
+                int dado2 = (int) evento.get("dado2");
+
+                tabuleiroView.atualizarDados(dado1, dado2);
+                if (dado1 == dado2) {
+                	btnLancarDados.setEnabled(true);
+                	
+                }else {
+                	btnLancarDados.setEnabled(false);
+                }
+                
+            }
+            case "MOVER_JOGADOR" -> {
+                int indice = (int) evento.get("indiceJogador");
+                int casas = (int) evento.get("casas");
+                
+                tabuleiroView.moverPino(indice, casas);
+            }
+            case "MOVER_JOGADOR_PRISAO" -> { 
+                int indice = (int) evento.get("indiceJogador");
+                tabuleiroView.setarPosicaoJogadorPrisao(indice, 10);
+            }
+            
+            
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
@@ -116,7 +141,7 @@ public class JogoView extends JFrame implements Observador{
 	            painelAcoesCarta.revalidate();
 	            painelAcoesCarta.repaint();
 	
-	            btnLancarDados.setEnabled(false); // desativa jogada até escolher ação
+//	            btnLancarDados.setEnabled(false); // desativa jogada até escolher ação
 	        } else {
 	            // Outros tipos de carta (Sorte/Reves, etc.)
 	            JButton btnOk = new JButton("OK");
@@ -128,7 +153,7 @@ public class JogoView extends JFrame implements Observador{
 	            painelAcoesCarta.revalidate();
 	            painelAcoesCarta.repaint();
 	
-	            btnLancarDados.setEnabled(false);
+//	            btnLancarDados.setEnabled(false);
 	        }
         } else {
         	if (dono & (tipo==2)) {
@@ -224,13 +249,16 @@ public class JogoView extends JFrame implements Observador{
             // Movimento no tabuleiro
             ArrayList<Integer> valores = controller.lancarDados();
             int casas = valores.get(0) + valores.get(1);
+            controller.incrementaRodadas();
+            if ((valores.get(0) == valores.get(1)) && (controller.getNumRodadas() >= 3)) {
+            	controller.prenderJogador();
+            	btnLancarDados.setEnabled(false);
+            	return;
+            }
             controller.moverJogador(casas);
-            tabuleiroView.moverPino(jogadorAtual, casas);
             
-            // Atualiza o tabuleiro graficamente
-            tabuleiroView.atualizarDados(valores.get(0), valores.get(1));
-            btnLancarDados.setEnabled(false);
 
+            
             // Verifica falência e fim de jogo
             controller.verificarFalencia();
             if (controller.getJogadores() == 1) {
@@ -242,9 +270,11 @@ public class JogoView extends JFrame implements Observador{
 
             lblStatus.setText("Jogador moveu " + casas + " casas.");
             jogadorAtual = (jogadorAtual + 1) % numJogadores;
+            
         });
 
         btnProximoJogador.addActionListener(e -> {
+        	controller.zeraRodadas();
             this.controller.proximaRodada();
             btnLancarDados.setEnabled(true);
             lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());

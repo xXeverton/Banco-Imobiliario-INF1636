@@ -15,7 +15,7 @@ public class Fachada extends Observavel {
     private int indiceJogadorAtual;
     private Casa casaAtual;
     private DeckSorteReves deckSorteReves; 
-
+    
     private Fachada() {
         this.banco = new Banco();
         this.tabuleiro = new Tabuleiro();
@@ -66,6 +66,9 @@ public class Fachada extends Observavel {
     public TipoCasa moverJogador(int casas) {
     	Jogador j = jogadores.get(indiceJogadorAtual);
         this.casaAtual = tabuleiro.moverJogador(j, casas);
+        
+        EventoMoverJogador evento = new EventoMoverJogador(indiceJogadorAtual, casas);
+        notificarObservadores(evento);
         return this.casaAtual.getTipo();
     }
     
@@ -101,7 +104,12 @@ public class Fachada extends Observavel {
     
     // === DADO ===
     public ArrayList<Integer> lancarDados() {
-        return dado.lancarDados();
+    	ArrayList<Integer> valores = dado.lancarDados(); // usa a sua classe Dado.java
+        int dado1 = valores.get(0);
+        int dado2 = valores.get(1);
+
+        notificarObservadores(new EventoLancarDados(dado1, dado2));
+        return valores;
     }
 
     // === BANCO ===
@@ -141,6 +149,9 @@ public class Fachada extends Observavel {
     public void prenderJogador() {
         Jogador j = getJogadorAtual();
         j.setPreso(true);
+        j.setPosicao(10);
+        EventoMoverJogadorPrisao evento = new EventoMoverJogadorPrisao(indiceJogadorAtual);
+        notificarObservadores(evento);
     }
     
     public boolean jogadorIsPreso() {

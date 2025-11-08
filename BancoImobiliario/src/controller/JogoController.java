@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class JogoController {
     private Fachada f;
     private int casas;
+    private int rodadas_jogador = 0;
     public JogoController() {
         this.f = Fachada.getInstancia();  // Singleton
     }
@@ -53,8 +54,7 @@ public class JogoController {
                 break;
 
             case VA_PARA_PRISAO:
-                System.out.println("Você foi preso!");
-                f.prenderJogador();
+                prenderJogador();
                 break;
 
             case SORTE_REVES:
@@ -157,6 +157,11 @@ public class JogoController {
         f.processarRodadaPrisao();
     }
 
+    public void prenderJogador() {
+    	System.out.println("Você foi preso!");
+    	f.prenderJogador();
+    }
+    
     public void verificarFalencia() {
         f.verificarFalencia();
     }
@@ -165,4 +170,15 @@ public class JogoController {
         f.proximoJogador();
     }
     
+    public void incrementaRodadas() {
+    	this.rodadas_jogador++;
+    }
+    
+    public int getNumRodadas() {
+    	return this.rodadas_jogador;
+    }
+    
+    public void zeraRodadas() {
+    	this.rodadas_jogador = 0;
+    }
 }

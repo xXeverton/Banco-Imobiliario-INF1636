@@ -76,9 +76,36 @@ public class TabuleiroView extends JPanel {
         repaint();
     }
 
+    public void setarPosicaoJogadorPrisao(int indice, int posfinal) {
+    	if (posicoesPinos == null || indice >= posicoesPinos.size()) return;
+    	posicaoAtual[indice] = posfinal;
+    	
+        int espacamento = 25;
+        int linha = indice % 2;
+        int coluna = indice / 2;
+
+        int offset = posfinal % 10;
+        
+    	int x = 530;
+    	int y = 600;
+    	int primeiroPasso = 70;
+    	int passo = 47;
+        if (offset == 0) {
+        } else if (offset == 1) {
+            y -= primeiroPasso;
+        } else {
+            y -= primeiroPasso + (offset - 1) * passo;
+        }
+         
+         x = x + (coluna * espacamento);
+         y = y - (linha * espacamento);
+         posicoesPinos.set(indice, new Point(x, y));
+         repaint();
+    }
+    
     public void moverPino(int indice, int casas) {
         if (posicoesPinos == null || indice >= posicoesPinos.size()) return;
-
+        System.out.println(indice);
         int posicao = (posicaoAtual[indice] + casas) % 40;
         posicaoAtual[indice] = posicao;
 
