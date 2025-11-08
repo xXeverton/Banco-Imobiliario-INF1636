@@ -97,7 +97,7 @@ public class JogoView extends JFrame implements Observador{
                 
                 tabuleiroView.moverPino(indice, casas);
             }
-            case "MOVER_JOGADOR_PRISAO" -> {
+            case "MOVER_JOGADOR_PRISAO" -> { 
                 int indice = (int) evento.get("indiceJogador");
                 tabuleiroView.setarPosicaoJogadorPrisao(indice, 10);
             }
