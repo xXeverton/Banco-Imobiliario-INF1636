@@ -36,6 +36,15 @@ public class JogoController {
         System.out.println("Jogador " + f.getJogadorAtual() + " tirou " + valores.get(0) + "," + valores.get(1));
         return valores;
     }
+    
+    // 🔹 Métodos para modo TESTADOR 
+    public void setModoTeste(boolean modo) {
+    	f.setModoTeste(modo);
+    }
+    
+    public void setValoresTeste(int d1, int d2) {
+    	f.setValoresTeste(d1, d2);
+    }
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {

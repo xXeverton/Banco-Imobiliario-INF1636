@@ -111,6 +111,15 @@ public class Fachada extends Observavel {
         notificarObservadores(new EventoLancarDados(dado1, dado2));
         return valores;
     }
+    
+    // Novos métodos para o modo teste
+    public void setModoTeste(boolean modo) {
+    	dado.setModoTeste(modo);
+    }
+    
+    public void setValoresTeste(int d1, int d2) {
+    	dado.setValoresTeste(d1, d2);
+    }
 
     // === BANCO ===
     public void impostoJogador() {
