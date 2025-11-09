@@ -96,13 +96,54 @@ public class Fachada extends Observavel {
         }
     }
     
+
     public void notificarCartaSorteReves() {
         CartaSorteReves carta = this.deckSorteReves.tirarCarta();
+        
         EventoExibirCartaSorteReves evento = new EventoExibirCartaSorteReves(carta);
-        notificarObservadores(evento); // Método do Observável
+        notificarObservadores(evento); 
+        
+        TipoAcaoCarta acao = carta.getAcao();
+        Jogador j = getJogadorAtual();
+        
+        switch (acao) {
+            case IR_PARA_PRISAO:
+                this.prenderJogador(); 
+                break;
+            
+            case MOVER_PARA_PONTO_PARTIDA:
+                this.moverJogadorParaPartida();
+                break;
+            
+            case PAGAR_DINHEIRO_BANCO:
+                j.debito(carta.getValor());
+                break;
+                
+            case RECEBER_DINHEIRO_BANCO:
+                j.credito(carta.getValor());
+                break;
+                
+            case SAIDA_LIVRE_PRISAO:
+                j.addHabeasCorpus();
+                break;
+
+            case RECEBER_DINHEIRO_JOGADORES:
+                for (Jogador jogador : jogadores) {
+                    if (jogador != j) {
+                        jogador.debito(carta.getValor());
+                        j.credito(carta.getValor());
+                    }
+                }
+                break;
+
+            default:
+                System.out.println("Ação da carta '" + acao + "' (ID: " + carta.getId() + ") ainda não implementada.");
+        }
+        
+        this.deckSorteReves.devolverCarta(carta);
     }
     
-    // === DADO ===
+	// === DADO ===
     public ArrayList<Integer> lancarDados() {
     	ArrayList<Integer> valores = dado.lancarDados(); // usa a sua classe Dado.java
         int dado1 = valores.get(0);
@@ -110,6 +151,33 @@ public class Fachada extends Observavel {
 
         notificarObservadores(new EventoLancarDados(dado1, dado2));
         return valores;
+    }
+    
+    // Novos métodos para o modo teste
+    public void setModoTeste(boolean modo) {
+    	dado.setModoTeste(modo);
+    }
+    
+    public void setValoresTeste(int d1, int d2) {
+    	dado.setValoresTeste(d1, d2);
+    }
+    
+    // == Deck Sorte ou Reves
+    public void setModoTesteCartas(boolean modo) {
+        deckSorteReves.setModoTeste(modo);
+    }
+    
+    public void setProximaCartaTeste(int idCarta) {
+        deckSorteReves.setProximaCartaTeste(idCarta);
+    }
+    
+    private void moverJogadorParaPartida() {
+        Jogador j = getJogadorAtual();
+        j.setPosicao(0);
+        
+        this.premiacaoJogador(); 
+
+        notificarObservadores(new EventoMoverJogadorParaPartida(indiceJogadorAtual));
     }
 
     // === BANCO ===
@@ -154,14 +222,43 @@ public class Fachada extends Observavel {
         notificarObservadores(evento);
     }
     
+    
     public boolean jogadorIsPreso() {
     	Jogador j = getJogadorAtual();
     	return j.isPreso();
     }
     
+	/*
+	 * public void processarRodadaPrisao(){ Jogador jogador = getJogadorAtual(); if
+	 * (jogador.isPreso()) { ArrayList<Integer> valores = dado.lancarDados();
+	 * System.out.println("Valores " + valores.get(0) + " e " + valores.get(1)); if
+	 * (valores.get(0) == valores.get(1)) { jogador.setRodadasPreso(0);
+	 * this.soltarJogador(); return; } jogador.incrementarRodadaPreso();
+	 * System.out.println("Jogador " + jogador.getCor() + " está preso há " +
+	 * jogador.getRodadasPreso() + " rodada(s).");
+	 * 
+	 * if (jogador.getRodadasPreso() == 3) {
+	 * System.out.println("Próxima rodada o jogador " + jogador.getCor() +
+	 * " saira do banco pagando uma multa de R$50 caso não acerte os dados"); }
+	 * 
+	 * if (jogador.getRodadasPreso() > 3) { banco.pagarMultaPrisao(jogador);
+	 * jogador.setRodadasPreso(0); this.soltarJogador(); }
+	 * 
+	 * } }
+	 */
+    
     public void processarRodadaPrisao(){
         Jogador jogador = getJogadorAtual();
+        
         if (jogador.isPreso()) {
+            
+            if (jogador.temHabeasCorpus()) {
+                jogador.usarHabeasCorpus(); // Gasta a carta
+                this.soltarJogador();
+                System.out.println("Jogador " + jogador.getCor() + " usou 'Saída Livre da Prisão'!");
+                return; // Sai da prisão, não joga os dados
+            }
+            
         	ArrayList<Integer> valores = dado.lancarDados();
         	System.out.println("Valores " + valores.get(0) + " e " + valores.get(1));
         	if (valores.get(0) == valores.get(1)) {
@@ -257,4 +354,12 @@ public class Fachada extends Observavel {
         }
     }
     
+    // Só pra visualizar o dinheiro no console
+    public double getDinheiroJogadorAtual() {
+        Jogador j = getJogadorAtual();
+        if (j != null) {
+            return j.getDinheiro();
+        }
+        return 0; 
+    }
 }
