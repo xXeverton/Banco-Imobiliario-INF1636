@@ -3,22 +3,28 @@ package game;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
- 
 
+/**
+ * Representa o baralho (deck) de cartas Sorte ou Revés.
+ * Gerencia a criação, embaralhamento e distribuição das cartas.
+ * Esta classe é package-private, usada internamente pelo Model.
+ */
 class DeckSorteReves {
 
     private List<CartaSorteReves> cartas;
-    
-    private boolean modoTeste = false;
-    private int idCartaTeste = 1;
 
-
+    /**
+     * Construtor que inicializa e embaralha o deck de cartas.
+     */
     public DeckSorteReves() {
         cartas = new LinkedList<>();
         inicializarDeck();
-		embaralhar(); 
+        embaralhar();
     }
 
+    /**
+     * Preenche o deck com as 30 cartas Sorte/Revés definidas.
+     */
     private void inicializarDeck() {
         // Cartas Sorte (IDs 1 a 15)
         cartas.add(new CartaSorteReves("A prefeitura mandou abrir uma nova avenida... Receba 25.", TipoAcaoCarta.RECEBER_DINHEIRO_BANCO, 25, 1)); // chance1.png
@@ -55,32 +61,31 @@ class DeckSorteReves {
         cartas.add(new CartaSorteReves("A geada prejudicou a sua safra de café. Pague 50.", TipoAcaoCarta.PAGAR_DINHEIRO_BANCO, 50, 30)); // chance30.png    
       }
 
+    /**
+     * Embaralha as cartas no deck.
+     */
     public void embaralhar() {
         Collections.shuffle(cartas);
     }
 
-
+    /**
+     * Retira a carta do topo do deck.
+     * @return A carta retirada, ou null se o deck estiver vazio.
+     */
     public CartaSorteReves tirarCarta() {
         if (cartas.isEmpty()) {
             // Poderia relançar o deck aqui se necessário
             return null;
         }
-        
-        if (modoTeste) {
-        	for (int i = 0; i < cartas.size(); i++) {
-        		if (cartas.get(i).getId() == idCartaTeste) {
-        			CartaSorteReves cartaForcada = cartas.remove(i); // Tira a carta
-        			return cartaForcada;
-        			
-        		}
-        	}
-        }
-        CartaSorteReves c = ((LinkedList<CartaSorteReves>) cartas).removeFirst();
-        
-        return c;
+        // LinkedList permite remoção eficiente do início
+        return ((LinkedList<CartaSorteReves>) cartas).removeFirst();
     }
 
-
+    /**
+     * Devolve uma carta ao fundo do deck.
+     * Usado para cartas que não são "Saída Livre da Prisão".
+     * @param carta A carta a ser devolvida.
+     */
     public void devolverCarta(CartaSorteReves carta) {
         if (carta != null) {
             // LinkedList permite adição eficiente no final
@@ -88,16 +93,11 @@ class DeckSorteReves {
         }
     }
 
-
+     /**
+     * Retorna o número de cartas restantes no deck. (Opcional)
+     * @return O número de cartas.
+     */
     public int numeroDeCartas() {
         return cartas.size();
-    }
-    
-    public void setModoTeste(boolean modo) {
-        this.modoTeste = modo;
-    }
-    
-    public void setProximaCartaTeste(int idCarta) {
-        this.idCartaTeste = idCarta;
     }
 }

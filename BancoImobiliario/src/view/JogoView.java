@@ -19,15 +19,6 @@ public class JogoView extends JFrame implements Observador{
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
-    // add modo testador
-    private JCheckBox chkModoTeste;
-    private JComboBox<Integer> comboDado1;
-    private JComboBox<Integer> comboDado2;
-    private JLabel lblDado1, lblDado2;
-    // modo testador Sorte ou Reves
-    private JCheckBox chkModoTesteCartas;
-    private JComboBox<Integer> comboCartaId;
-    private JLabel lblCarta;
 
 
     private int numJogadores;
@@ -45,42 +36,6 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(btnLancarDados);
         painelBotoes.add(btnProximoJogador);
         painelBotoes.add(lblStatus);
-        
-        // 🔹 Painel dos botões MODO TESTADOR
-        
-        lblDado1 = new JLabel("Dado 1:");
-        comboDado1 = new JComboBox<>(new Integer[] {1,2,3,4,5,6});
-        comboDado1.setEnabled(false); // Começa desaabilitado
-        
-        lblDado2 = new JLabel("Dado 2:");
-        comboDado2 = new JComboBox<>(new Integer[] {1,2,3,4,5,6});
-        comboDado2.setEnabled(false); // Começa desaabilitado
-        
-        chkModoTeste = new JCheckBox("Modo Teste");
-        
-        painelBotoes.add(chkModoTeste);
-        painelBotoes.add(lblDado1);
-        painelBotoes.add(comboDado1);
-        painelBotoes.add(lblDado2);
-        painelBotoes.add(comboDado2);
-        
-     // 🔹 Painel Modo testador de cartas sorte ou reves
-        lblCarta = new JLabel("Carta ID:");
-        
-        //
-        Integer[] idsCartas = new Integer[30];
-        for (int i = 0; i < 30; i++) {
-            idsCartas[i] = i + 1;
-        }
-        
-        comboCartaId = new JComboBox<>(idsCartas);
-        comboCartaId.setEnabled(false); 
-        
-        chkModoTesteCartas = new JCheckBox("Testar Cartas");
-        
-        painelBotoes.add(chkModoTesteCartas);
-        painelBotoes.add(lblCarta);
-        painelBotoes.add(comboCartaId);
 
         // 🔹 Painel de ações das cartas
         painelAcoesCarta = new JPanel();
@@ -148,10 +103,6 @@ public class JogoView extends JFrame implements Observador{
                 tabuleiroView.setarPosicaoJogadorPrisao(indice, 10);
             }
             
-            case "MOVER_JOGADOR_PARTIDA" -> {
-                int indice = (int) evento.get("indiceJogador");
-                tabuleiroView.setarPosicaoJogadorPartida(indice);
-            }
             
             default -> System.out.println("Evento não tratado: " + evento);
         }
@@ -285,102 +236,47 @@ public class JogoView extends JFrame implements Observador{
         lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
     }
     private void configurarListeners() {
-    	
-    	// Listener do Modo Teste
-    	chkModoTeste.addItemListener(new java.awt.event.ItemListener() {
-            @Override
-            public void itemStateChanged(java.awt.event.ItemEvent e) {
-                // Verifica se o checkbox foi selecionado
-                boolean selecionado = (e.getStateChange() == java.awt.event.ItemEvent.SELECTED);
-                
-                // Habilita ou desabilita os ComboBoxes
-                comboDado1.setEnabled(selecionado);
-                comboDado2.setEnabled(selecionado);
+
+        btnLancarDados.addActionListener(e -> {
+            // Jogador atual tenta jogar
+            if (controller.verificaPrisao()) {
+                lblStatus.setText("Jogador preso! Tentando sair...");
+                controller.processarPrisao();
+                controller.proximaRodada();
+                lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
+                return;
             }
+            // Movimento no tabuleiro
+            ArrayList<Integer> valores = controller.lancarDados();
+            int casas = valores.get(0) + valores.get(1);
+            controller.incrementaRodadas();
+            if ((valores.get(0) == valores.get(1)) && (controller.getNumRodadas() >= 3)) {
+            	controller.prenderJogador();
+            	btnLancarDados.setEnabled(false);
+            	return;
+            }
+            controller.moverJogador(casas);
+            
+
+            
+            // Verifica falência e fim de jogo
+            controller.verificarFalencia();
+            if (controller.getJogadores() == 1) {
+                lblStatus.setText("Jogador " + controller.getCorJogadorAtual() + " venceu!");
+                btnLancarDados.setEnabled(false);
+                btnProximoJogador.setEnabled(false);
+                return;
+            }
+
+            lblStatus.setText("Jogador moveu " + casas + " casas.");
+            jogadorAtual = (jogadorAtual + 1) % numJogadores;
+            
         });
-    	
-    	chkModoTesteCartas.addItemListener(new java.awt.event.ItemListener() {
-            @Override
-            public void itemStateChanged(java.awt.event.ItemEvent e) {
-                // Verifica se o checkbox foi selecionado
-                boolean selecionado = (e.getStateChange() == java.awt.event.ItemEvent.SELECTED);
-                
-                // Habilita ou desabilita o ComboBox das Cartas
-                comboCartaId.setEnabled(selecionado);
-            }
-        });
-
-    	btnLancarDados.addActionListener(e -> {
-
-			boolean modoTeste = this.isModoTeste();
-			controller.setModoTeste(modoTeste);
-
-			if (modoTeste) {
-				int d1 = this.getValoresDado1();
-				int d2 = this.getValoresDado2();
-				controller.setValoresTeste(d1, d2);
-			}
-			
-						if (controller.verificaPrisao()) {
-							lblStatus.setText("Jogador preso! Tentando sair...");
-			                controller.processarPrisao(); 
-			                
-			                if (controller.verificaPrisao()) {
-			                    controller.proximaRodada();
-			                    lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
-			                    return; 
-			                } else {
-			                    lblStatus.setText("Jogador saiu da prisão! Lançando dados...");
-			                }
-						}
-			
-			boolean modoTesteCartas = this.isModoTesteCartas();
-            controller.setModoTesteCartas(modoTesteCartas);
-            if (modoTesteCartas) {
-                int idCarta = this.getCartaIdSelecionada();
-                controller.setProximaCartaTeste(idCarta);
-            }
-
-			if (controller.verificaPrisao()) {
-				lblStatus.setText("Jogador preso! Tentando sair...");
-				controller.processarPrisao();
-				controller.proximaRodada();
-				lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
-				return;
-			}
-
-			ArrayList<Integer> valores = controller.lancarDados();
-			int casas = valores.get(0) + valores.get(1);
-			controller.incrementaRodadas();
-			if ((valores.get(0) == valores.get(1)) && (controller.getNumRodadas() >= 3)) {
-				controller.prenderJogador();
-				btnLancarDados.setEnabled(false);
-				return;
-			}
-			controller.moverJogador(casas);
-
-			controller.verificarFalencia();
-			if (controller.getJogadores() == 1) {
-				lblStatus.setText("Jogador " + controller.getCorJogadorAtual() + " venceu!");
-				btnLancarDados.setEnabled(false);
-				btnProximoJogador.setEnabled(false);
-				return;
-			}
-
-			lblStatus.setText("Jogador moveu " + casas + " casas.");
-			jogadorAtual = (jogadorAtual + 1) % numJogadores;
-
-		});
 
         btnProximoJogador.addActionListener(e -> {
         	controller.zeraRodadas();
             this.controller.proximaRodada();
             btnLancarDados.setEnabled(true);
-            // Para visualizar situação do Jogador
-            String cor = controller.getCorJogadorAtual();
-            double dinheiro = controller.getDinheiroJogadorAtual();
-            System.out.println("--- Próxima Rodada: Jogador " + cor + " | Saldo Atual: R$" + dinheiro + " ---");
-            
             lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
             tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
         });
@@ -398,54 +294,8 @@ public class JogoView extends JFrame implements Observador{
         }
     }
     
- // 🔹 Getters para o controller
-    public boolean isModoTeste() {
-    	return chkModoTeste.isSelected();
-    }
-    
-    public int getValoresDado1() {
-    	return (Integer) comboDado1.getSelectedItem();
-    }
-    
-    public int getValoresDado2() {
-    	return (Integer) comboDado2.getSelectedItem();
-    }
-    
-    public JCheckBox getChkModoTeste() {
-        return chkModoTeste;
-    }
-
-    public JComboBox<Integer> getComboDado1() {
-        return comboDado1;
-    }
-
-    public JComboBox<Integer> getComboDado2() {
-        return comboDado2;
-    }
-    
-    // 🔹 Métodos para testador cartas sorte ou reves
-	
-    public boolean isModoTesteCartas() {
-        return chkModoTesteCartas.isSelected();
-    }
-    
-    public int getCartaIdSelecionada() {
-        return (Integer) comboCartaId.getSelectedItem();
-    }
-    
-    public JCheckBox getChkModoTesteCartas() {
-        return chkModoTesteCartas;
-    }
-    
-    public JComboBox<Integer> getComboCartaId() {
-        return comboCartaId;
-    }
-   
-    
     // 🔹 Método main para rodar o jogo
-	
-	  public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
-	  JogoView()); }
-	 
-	 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new JogoView());
+    }
 }

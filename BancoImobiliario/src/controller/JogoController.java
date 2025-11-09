@@ -36,23 +36,6 @@ public class JogoController {
         System.out.println("Jogador " + f.getJogadorAtual() + " tirou " + valores.get(0) + "," + valores.get(1));
         return valores;
     }
-    
-    // 🔹 Métodos para modo TESTADOR 
-    public void setModoTeste(boolean modo) {
-    	f.setModoTeste(modo);
-    }
-    
-    public void setValoresTeste(int d1, int d2) {
-    	f.setValoresTeste(d1, d2);
-    }
-    
-    public void setModoTesteCartas(boolean modo) {
-        f.setModoTesteCartas(modo);
-    }
-    
-    public void setProximaCartaTeste(int idCarta) {
-        f.setProximaCartaTeste(idCarta);
-    }
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {
@@ -197,10 +180,5 @@ public class JogoController {
     
     public void zeraRodadas() {
     	this.rodadas_jogador = 0;
-    }
-    
-    // Só pra visualizar no console a quantidade de dinheiro
-    public double getDinheiroJogadorAtual() {
-    	return f.getDinheiroJogadorAtual();
     }
 }
