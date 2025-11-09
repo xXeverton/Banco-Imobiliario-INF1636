@@ -103,27 +103,6 @@ public class TabuleiroView extends JPanel {
          repaint();
     }
     
-    
-    public void setarPosicaoJogadorPartida(int indice) {
-        if (posicoesPinos == null || indice >= posicoesPinos.size()) return;
-
-        posicaoAtual[indice] = 0; 
-        
-       
-        int baseX = 1125;
-        int baseY = 605;
-        int espacamento = 25;
-
-        int coluna = indice % 2; 
-        int linha = indice / 2; 
-
-        int x = baseX + (coluna * espacamento);
-        int y = baseY - (linha * espacamento);
-
-        posicoesPinos.set(indice, new Point(x, y));
-        repaint();
-    }
-    
     public void moverPino(int indice, int casas) {
         if (posicoesPinos == null || indice >= posicoesPinos.size()) return;
         System.out.println(indice);
