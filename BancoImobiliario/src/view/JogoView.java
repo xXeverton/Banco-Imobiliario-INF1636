@@ -148,6 +148,10 @@ public class JogoView extends JFrame implements Observador{
                 tabuleiroView.setarPosicaoJogadorPrisao(indice, 10);
             }
             
+            case "MOVER_JOGADOR_PARTIDA" -> {
+                int indice = (int) evento.get("indiceJogador");
+                tabuleiroView.setarPosicaoJogadorPartida(indice);
+            }
             
             default -> System.out.println("Evento não tratado: " + evento);
         }
@@ -317,6 +321,19 @@ public class JogoView extends JFrame implements Observador{
 				controller.setValoresTeste(d1, d2);
 			}
 			
+						if (controller.verificaPrisao()) {
+							lblStatus.setText("Jogador preso! Tentando sair...");
+			                controller.processarPrisao(); 
+			                
+			                if (controller.verificaPrisao()) {
+			                    controller.proximaRodada();
+			                    lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
+			                    return; 
+			                } else {
+			                    lblStatus.setText("Jogador saiu da prisão! Lançando dados...");
+			                }
+						}
+			
 			boolean modoTesteCartas = this.isModoTesteCartas();
             controller.setModoTesteCartas(modoTesteCartas);
             if (modoTesteCartas) {
@@ -359,6 +376,11 @@ public class JogoView extends JFrame implements Observador{
         	controller.zeraRodadas();
             this.controller.proximaRodada();
             btnLancarDados.setEnabled(true);
+            // Para visualizar situação do Jogador
+            String cor = controller.getCorJogadorAtual();
+            double dinheiro = controller.getDinheiroJogadorAtual();
+            System.out.println("--- Próxima Rodada: Jogador " + cor + " | Saldo Atual: R$" + dinheiro + " ---");
+            
             lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
             tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
         });

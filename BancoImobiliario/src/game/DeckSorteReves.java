@@ -3,7 +3,7 @@ package game;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
+ 
 
 class DeckSorteReves {
 
@@ -75,9 +75,9 @@ class DeckSorteReves {
         		}
         	}
         }
+        CartaSorteReves c = ((LinkedList<CartaSorteReves>) cartas).removeFirst();
         
-        // LinkedList permite remoção eficiente do início
-        return ((LinkedList<CartaSorteReves>) cartas).removeFirst();
+        return c;
     }
 
 

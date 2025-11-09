@@ -11,6 +11,7 @@ public class Jogador {
 	private String cor;
 	private int rodadasPreso;
 	private int posicao;
+	private boolean temHabeasCorpus;
 
 	public Jogador(int numero_jogador, String cor) {
 		this.numero_jogador = numero_jogador;
@@ -20,6 +21,7 @@ public class Jogador {
         this.preso = false;
         this.cor = cor;
         this.posicao = 0;
+        this.temHabeasCorpus = false;
 	}
 	
 	public String getCor() {
@@ -166,4 +168,18 @@ public class Jogador {
 	public void setPosicao(int posicao) {
 		this.posicao = posicao;
 	}	
+	
+	public void addHabeasCorpus() {
+		this.temHabeasCorpus = true;
+	}
+	
+	public boolean temHabeasCorpus() {
+        return this.temHabeasCorpus;
+    }
+	
+	public void usarHabeasCorpus() {
+        this.temHabeasCorpus = false;
+    }
+	
+	
 }

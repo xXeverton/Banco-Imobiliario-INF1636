@@ -198,4 +198,9 @@ public class JogoController {
     public void zeraRodadas() {
     	this.rodadas_jogador = 0;
     }
+    
+    // Só pra visualizar no console a quantidade de dinheiro
+    public double getDinheiroJogadorAtual() {
+    	return f.getDinheiroJogadorAtual();
+    }
 }
