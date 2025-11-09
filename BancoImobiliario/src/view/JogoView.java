@@ -24,6 +24,10 @@ public class JogoView extends JFrame implements Observador{
     private JComboBox<Integer> comboDado1;
     private JComboBox<Integer> comboDado2;
     private JLabel lblDado1, lblDado2;
+    // modo testador Sorte ou Reves
+    private JCheckBox chkModoTesteCartas;
+    private JComboBox<Integer> comboCartaId;
+    private JLabel lblCarta;
 
 
     private int numJogadores;
@@ -60,6 +64,23 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(lblDado2);
         painelBotoes.add(comboDado2);
         
+     // 🔹 Painel Modo testador de cartas sorte ou reves
+        lblCarta = new JLabel("Carta ID:");
+        
+        //
+        Integer[] idsCartas = new Integer[30];
+        for (int i = 0; i < 30; i++) {
+            idsCartas[i] = i + 1;
+        }
+        
+        comboCartaId = new JComboBox<>(idsCartas);
+        comboCartaId.setEnabled(false); 
+        
+        chkModoTesteCartas = new JCheckBox("Testar Cartas");
+        
+        painelBotoes.add(chkModoTesteCartas);
+        painelBotoes.add(lblCarta);
+        painelBotoes.add(comboCartaId);
 
         // 🔹 Painel de ações das cartas
         painelAcoesCarta = new JPanel();
@@ -273,6 +294,17 @@ public class JogoView extends JFrame implements Observador{
                 comboDado2.setEnabled(selecionado);
             }
         });
+    	
+    	chkModoTesteCartas.addItemListener(new java.awt.event.ItemListener() {
+            @Override
+            public void itemStateChanged(java.awt.event.ItemEvent e) {
+                // Verifica se o checkbox foi selecionado
+                boolean selecionado = (e.getStateChange() == java.awt.event.ItemEvent.SELECTED);
+                
+                // Habilita ou desabilita o ComboBox das Cartas
+                comboCartaId.setEnabled(selecionado);
+            }
+        });
 
     	btnLancarDados.addActionListener(e -> {
 
@@ -284,6 +316,13 @@ public class JogoView extends JFrame implements Observador{
 				int d2 = this.getValoresDado2();
 				controller.setValoresTeste(d1, d2);
 			}
+			
+			boolean modoTesteCartas = this.isModoTesteCartas();
+            controller.setModoTesteCartas(modoTesteCartas);
+            if (modoTesteCartas) {
+                int idCarta = this.getCartaIdSelecionada();
+                controller.setProximaCartaTeste(idCarta);
+            }
 
 			if (controller.verificaPrisao()) {
 				lblStatus.setText("Jogador preso! Tentando sair...");
@@ -362,9 +401,29 @@ public class JogoView extends JFrame implements Observador{
         return comboDado2;
     }
     
+    // 🔹 Métodos para testador cartas sorte ou reves
+	
+    public boolean isModoTesteCartas() {
+        return chkModoTesteCartas.isSelected();
+    }
+    
+    public int getCartaIdSelecionada() {
+        return (Integer) comboCartaId.getSelectedItem();
+    }
+    
+    public JCheckBox getChkModoTesteCartas() {
+        return chkModoTesteCartas;
+    }
+    
+    public JComboBox<Integer> getComboCartaId() {
+        return comboCartaId;
+    }
+   
     
     // 🔹 Método main para rodar o jogo
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new JogoView());
-    }
+	
+	  public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
+	  JogoView()); }
+	 
+	 
 }

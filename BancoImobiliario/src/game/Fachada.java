@@ -120,6 +120,15 @@ public class Fachada extends Observavel {
     public void setValoresTeste(int d1, int d2) {
     	dado.setValoresTeste(d1, d2);
     }
+    
+    // == Deck Sorte ou Reves
+    public void setModoTesteCartas(boolean modo) {
+        deckSorteReves.setModoTeste(modo);
+    }
+    
+    public void setProximaCartaTeste(int idCarta) {
+        deckSorteReves.setProximaCartaTeste(idCarta);
+    }
 
     // === BANCO ===
     public void impostoJogador() {

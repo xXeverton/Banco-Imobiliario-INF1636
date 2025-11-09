@@ -45,6 +45,14 @@ public class JogoController {
     public void setValoresTeste(int d1, int d2) {
     	f.setValoresTeste(d1, d2);
     }
+    
+    public void setModoTesteCartas(boolean modo) {
+        f.setModoTesteCartas(modo);
+    }
+    
+    public void setProximaCartaTeste(int idCarta) {
+        f.setProximaCartaTeste(idCarta);
+    }
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {
