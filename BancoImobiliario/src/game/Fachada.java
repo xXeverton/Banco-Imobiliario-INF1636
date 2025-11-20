@@ -16,7 +16,7 @@ public class Fachada extends Observavel {
     private List<Jogador> jogadores;
     private int indiceJogadorAtual;
     private Casa casaAtual;
-    private DeckSorteReves deckSorteReves; 
+    private DeckSorteReves deckSorteReves;
     
     private Fachada() {
         this.banco = new Banco();
@@ -63,6 +63,39 @@ public class Fachada extends Observavel {
     public String getCorJogadorAtual() {
         return getJogadorAtual().getCor();
     }
+    
+    public void notificarInfos(int indice) {
+        Jogador j = jogadores.get(indice);
+
+        double dinheiro = j.getDinheiro();
+        ArrayList<CardPropriedade> propriedades = j.getPropriedades();
+        ArrayList<CardCompanhia> companhias = j.getCompanhias();
+        boolean temHabeas = j.temHabeasCorpus();
+        String cor = j.getCor();
+
+        ArrayList<String> propriedades_j = new ArrayList<>();
+        for (CardPropriedade prop : propriedades) {
+            propriedades_j.add(prop.getNome());
+        }
+
+        ArrayList<Integer> companhias_j = new ArrayList<>();
+        for (CardCompanhia comp : companhias) {
+            companhias_j.add(comp.getIdImage());
+        }
+
+        // 🔹 Criar evento com todas as infos
+        EventoJogo evento = EventoInfosJogador.criar(
+                dinheiro,
+                propriedades_j,
+                companhias_j,
+                temHabeas,
+                cor
+        );
+
+        // 🔹 Notificar observadores (View)
+        notificarObservadores(evento);
+    }
+
 
     // === TABULEIRO / MOVIMENTAÇÃO ===
     public TipoCasa moverJogador(int casas) {

@@ -180,6 +180,22 @@ public class Jogador {
 	public void usarHabeasCorpus() {
         this.temHabeasCorpus = false;
     }
+
+	public ArrayList<CardPropriedade> getPropriedades() {
+		return propriedades;
+	}
+
+	public void setPropriedades(ArrayList<CardPropriedade> propriedades) {
+		this.propriedades = propriedades;
+	}
+
+	public ArrayList<CardCompanhia> getCompanhias() {
+		return companhias;
+	}
+
+	public void setCompanhias(ArrayList<CardCompanhia> companhias) {
+		this.companhias = companhias;
+	}
 	
 	
 }
