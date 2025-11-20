@@ -193,6 +193,10 @@ public class JogoController {
     	return f.getDinheiroJogadorAtual();
     }
     
+    public void notificarInfos(int indice) {
+    	f.notificarInfos(indice);
+    }
+}
     
     // Salvamento         
         public void salvarPartida() {
