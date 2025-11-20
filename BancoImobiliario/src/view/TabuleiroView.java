@@ -18,8 +18,7 @@ public class TabuleiroView extends JPanel {
     private int[] posicaoAtual;
     private Color corJogadorAtual = Color.RED;
     private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
-    private boolean exibirCarta = false; 
-    private int numJogadores;
+    private boolean exibirCarta = false;
     
     private int valorDado1 = 1;
     private int valorDado2 = 1;
@@ -43,11 +42,10 @@ public class TabuleiroView extends JPanel {
     public void inicializarPinos(int numJogadores) {
         imagensPinos = new ArrayList<>();
         posicoesPinos = new ArrayList<>();
-        this.numJogadores = numJogadores;
 
         // posição base (canto inferior direito, casa inicial)
-        int baseX = 1125;
-        int baseY = 605;
+        int baseX = 1110;
+        int baseY = 575;
 
         int espacamento = 25;
 
@@ -87,9 +85,8 @@ public class TabuleiroView extends JPanel {
         int coluna = indice / 2;
 
         int offset = posfinal % 10;
-        
-    	int x = 530;
-    	int y = 600;
+    	int x = 470;
+    	int y = 570;
     	int primeiroPasso = 70;
     	int passo = 47;
         if (offset == 0) {
@@ -112,8 +109,8 @@ public class TabuleiroView extends JPanel {
         posicaoAtual[indice] = 0; 
         
        
-        int baseX = 1125;
-        int baseY = 605;
+        int baseX = 1110;
+        int baseY = 575;
         int espacamento = 25;
 
         int coluna = indice % 2; 
@@ -141,10 +138,10 @@ public class TabuleiroView extends JPanel {
         // Define as bases de cada lado conforme suas anotações
         switch (lado) {
             case 0: // Base inferior (direita → esquerda)
-                x = 1125;
-                y = 605;
+                x = 1110;
+                y = 575;
                 primeiroPasso = 70;
-                passo = 55;
+                passo = 60;
                 if (offset == 0) {
                 } else if (offset == 1) {
                     x -= primeiroPasso;
@@ -154,10 +151,10 @@ public class TabuleiroView extends JPanel {
                 break;
 
             case 1: // Lado esquerdo (baixo → cima)
-                x = 530;
-                y = 600;
+                x = 470;
+                y = 570;
                 primeiroPasso = 70;
-                passo = 47;
+                passo = 45;
                 if (offset == 0) {
                 } else if (offset == 1) {
                     y -= primeiroPasso;
@@ -167,10 +164,10 @@ public class TabuleiroView extends JPanel {
                 break;
 
             case 2: // Topo (esquerda → direita)
-                x = 545;
-                y = 110;
-                primeiroPasso = 65;
-                passo = 55;
+                x = 485;
+                y = 90;
+                primeiroPasso = 75;
+                passo = 60;
                 if (offset == 0) {
                 } else if (offset == 1) {
                     x += primeiroPasso;
@@ -181,7 +178,7 @@ public class TabuleiroView extends JPanel {
 
             case 3: // Lado direito (cima → baixo)
                 x = 1115;
-                y = 100;
+                y = 80;
                 primeiroPasso = 60;
                 passo = 46;
                 if (offset == 0) {
@@ -281,9 +278,9 @@ public class TabuleiroView extends JPanel {
 
         // --- Desenha o tabuleiro ---
         if (imagemTabuleiro != null) {
-            int x = (getWidth() - 575);
-            int y = (getHeight() - 140);
-            g2d.drawImage(imagemTabuleiro, 520, 60, x, y, this);
+            int x = (getWidth() - 500);
+            int y = (getHeight() - 90);
+            g2d.drawImage(imagemTabuleiro, 450, 45, x, y, this);
         }
         // --- Desenha a área dos dados à esquerda ---
         g2d.setColor(new Color(240, 240, 240));
@@ -320,11 +317,6 @@ public class TabuleiroView extends JPanel {
             // Desenha a imagem da carta
             g2d.drawImage(imagemCartaSorteada, x, y, cardWidth, cardHeight, this);
         }
-        
-//        for (int i = 0; i < this.numJogadores; i++) {
-//        	g2d.setStroke(new BasicStroke(2));
-//            g2d.drawRoundRect(130, 250+(i*60), 240, 50, 20, 20);
-//        }
 
         g2d.dispose();
     }

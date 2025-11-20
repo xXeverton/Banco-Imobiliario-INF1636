@@ -203,4 +203,8 @@ public class JogoController {
     public double getDinheiroJogadorAtual() {
     	return f.getDinheiroJogadorAtual();
     }
+    
+    public void notificarInfos(int indice) {
+    	f.notificarInfos(indice);
+    }
 }

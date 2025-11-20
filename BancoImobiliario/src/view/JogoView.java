@@ -13,6 +13,7 @@ public class JogoView extends JFrame implements Observador{
     private static final long serialVersionUID = 1L;
     private final JogoController controller = new JogoController();
     private final TabuleiroView tabuleiroView = new TabuleiroView();
+    private InfoJogadorView infoJogador = new InfoJogadorView();;
     private final JButton btnLancarDados = new JButton("🎲 Lançar Dados");
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
@@ -20,6 +21,7 @@ public class JogoView extends JFrame implements Observador{
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
+    private JPanel painelSuperior = new JPanel();
     // add modo testador
     private JCheckBox chkModoTeste;
     private JComboBox<Integer> comboDado1;
@@ -65,7 +67,7 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(lblDado2);
         painelBotoes.add(comboDado2);
         
-     // 🔹 Painel Modo testador de cartas sorte ou reves
+        // 🔹 Painel Modo testador de cartas sorte ou reves
         lblCarta = new JLabel("Carta ID:");
         
         //
@@ -88,6 +90,13 @@ public class JogoView extends JFrame implements Observador{
         painelAcoesCarta.setLayout(new FlowLayout());
         painelAcoesCarta.setVisible(false);
 
+     // 🔹 BARRA SUPERIOR (Jogadores)
+        painelSuperior = new JPanel();
+        painelSuperior.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); 
+        painelSuperior.setPreferredSize(new Dimension(0, 60)); // altura semelhante ao inferior
+        add(painelSuperior, BorderLayout.NORTH);
+
+        
         // 🔹 Painel inferior que agrupa ambos
         JPanel painelInferior = new JPanel(new BorderLayout());
         painelInferior.add(painelBotoes, BorderLayout.NORTH);
@@ -160,7 +169,7 @@ public class JogoView extends JFrame implements Observador{
                 ArrayList<Integer> companhias = (ArrayList<Integer>) evento.get("companhias");
                 boolean habeas = (boolean) evento.get("temHabeasCorpus");
                 String cor = (String) evento.get("cor");
-
+                infoJogador.atualizar(cor, dinheiro, propriedades, companhias, habeas);
                 // atualizarPainelJogador(dinheiro, propriedades, companhias, habeas, cor);
                 break;
             }
@@ -399,30 +408,28 @@ public class JogoView extends JFrame implements Observador{
     }
 
     public void criarBotoesJogadores(int numJogadores) {
-        System.out.println("--- " + numJogadores + " ---");
-        setLayout(null); // importante para posicionar manualmente
-
         botoesJogadores.clear();
+        painelSuperior.removeAll();
 
         for (int i = 0; i < numJogadores; i++) {
-            JButton btn = new JButton("J" + (i + 1));
-
-            btn.setBounds(130, 250 + (i * 60), 240, 50); // mesma posição desenhada
-            btn.setOpaque(false);
-            btn.setContentAreaFilled(true);
-            btn.setBorderPainted(true);
-
-            final int jogadorIndex = i;
-
-            //btn.addActionListener(e -> abrirJanelaJogador(jogadorIndex));
+        	int index = i;
+            JButton btn = new JButton("Jogador " + cores[i]);
+            btn.setPreferredSize(new Dimension(150, 35)); // igual ao estilo da barra inferior
+            
+            btn.addActionListener(e -> {
+                infoJogador.setVisible(true);
+                controller.notificarInfos(index);
+                // Controller já dispara o evento ATUALIZAR_INFOS_JOGADOR automaticamente durante o jogo
+            });
             
             botoesJogadores.add(btn);
-            add(btn);
+            painelSuperior.add(btn);
         }
 
-        repaint();
+        painelSuperior.revalidate();
+        painelSuperior.repaint();
     }
-    
+
     private Color corPara(String corNome) {
         switch (corNome.toLowerCase()) {
             case "vermelho": return Color.RED;
