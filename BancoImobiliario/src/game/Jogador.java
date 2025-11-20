@@ -44,7 +44,7 @@ public class Jogador {
 		return dinheiro;
 	}
 	
-	public void setDinheiro(int dinheiro) {
+	public void setDinheiro(double dinheiro) {
 		this.dinheiro = dinheiro;
 	}
 
@@ -198,5 +198,33 @@ public class Jogador {
 		this.companhias = companhias;
 	}
 	
+	// Retorna os "IDs" das propriedades (nomes)
+    public ArrayList<String> getIdPropriedades() {
+        ArrayList<String> ids = new ArrayList<>();
+        for (CardPropriedade p : propriedades) {
+            ids.add(p.getNome()); // pega o nome como "ID"
+        }
+        return ids;
+    }
+
+    // Retorna os "IDs" das companhias (inteiros)
+    public ArrayList<Integer> getIdCompanhias() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (CardCompanhia c : companhias) {
+            ids.add(c.getIdImage()); // pega o ID da companhia
+        }
+        return ids;
+    }
+
+    // Métodos para adicionar objetos
+    public void adicionarPropriedade(CardPropriedade p) {
+        propriedades.add(p);
+        p.setDono(this); 
+    }
+    
+    public void adicionarCompanhia(CardCompanhia c) {
+        companhias.add(c);
+        c.setDono(this); 
+    }
 	
 }

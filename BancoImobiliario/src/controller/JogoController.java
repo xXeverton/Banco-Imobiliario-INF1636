@@ -3,7 +3,10 @@ package controller;
 import game.Fachada;
 import game.observer.*;
 
+import java.io.File;
 import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
 
 public class JogoController {
     private Fachada f;
@@ -150,22 +153,8 @@ public class JogoController {
                                " não conseguiu construir em " + f.getNomeCasaAtual());
         }
     }
-
-    // Pagar aluguel
-//    public void pagarAluguel(CardPropriedade prop, int valorDados) {
-//        Jogador j = getJogadorAtual();
-//        Jogador dono = prop.getDono();
-//
-//        if (dono != null && dono != j && (prop.getCasas() > 0 || prop.isHotel())) {
-//            int aluguel = prop.calcularAluguel(valorDados);
-//            j.debito(aluguel);  
-//            dono.credito(aluguel); 
-//            System.out.println(j.getCor() + " pagou aluguel de " + aluguel + " a " + dono.getCor());
-//        }
-//    }
-
-    // Prisão
     
+    // Prisão
     public boolean verificaPrisao() {
     	return f.jogadorIsPreso();
     }
@@ -208,3 +197,47 @@ public class JogoController {
     	f.notificarInfos(indice);
     }
 }
+    
+    // Salvamento         
+        public void salvarPartida() {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Salvar partida");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivo de Texto (*.txt)", "txt"));
+
+            int resposta = fc.showSaveDialog(null);
+            if (resposta == JFileChooser.APPROVE_OPTION) {
+                File arquivo = fc.getSelectedFile();
+                if (!arquivo.getName().endsWith(".txt")) {
+                    arquivo = new File(arquivo.getAbsolutePath() + ".txt");
+                }
+                try {
+                    // Pega o estado atual da fachada e manda salvar
+                    boolean salvamento = f.salvarJogo(arquivo);
+                    if (salvamento)
+                    	System.out.println("Partida salva em: " + arquivo.getAbsolutePath());
+                } catch (Exception e) {
+                    System.out.println("Erro ao salvar: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void carregarPartida() {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Carregar partida");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivo de Texto (*.txt)", "txt"));
+
+            int resposta = fc.showOpenDialog(null);
+            if (resposta == JFileChooser.APPROVE_OPTION) {
+                File arquivo = fc.getSelectedFile();
+                try {
+                    boolean carregado = f.carregarJogo(arquivo);
+                    if (carregado)
+                    	System.out.println("Partida carregada de: " + arquivo.getAbsolutePath());
+                } catch (Exception e) {
+                    System.out.println("Erro ao carregar: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }

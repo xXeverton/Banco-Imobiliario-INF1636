@@ -16,6 +16,7 @@ public class JogoView extends JFrame implements Observador{
     private InfoJogadorView infoJogador = new InfoJogadorView();;
     private final JButton btnLancarDados = new JButton("🎲 Lançar Dados");
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
+    private final JButton btnSalvamento = new JButton("Salvar Jogo 💾");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
@@ -47,6 +48,7 @@ public class JogoView extends JFrame implements Observador{
         
         painelBotoes.add(btnLancarDados);
         painelBotoes.add(btnProximoJogador);
+        painelBotoes.add(btnSalvamento);
         painelBotoes.add(lblStatus);
         
         // 🔹 Painel dos botões MODO TESTADOR
@@ -276,7 +278,7 @@ public class JogoView extends JFrame implements Observador{
     
     private void iniciarJogo() {
         numJogadores = 0;
-
+    	btnSalvamento.setEnabled(false);
         // Caixa de diálogo gráfica para escolher quantidade
         while (numJogadores < 2 || numJogadores > 6) {
             String input = JOptionPane.showInputDialog(
@@ -332,10 +334,10 @@ public class JogoView extends JFrame implements Observador{
         });
 
     	btnLancarDados.addActionListener(e -> {
-
+    		btnSalvamento.setEnabled(false);
 			boolean modoTeste = this.isModoTeste();
 			controller.setModoTeste(modoTeste);
-
+			
 			if (modoTeste) {
 				int d1 = this.getValoresDado1();
 				int d2 = this.getValoresDado2();
@@ -392,8 +394,13 @@ public class JogoView extends JFrame implements Observador{
 			jogadorAtual = (jogadorAtual + 1) % numJogadores;
 
 		});
+    	
+    	btnSalvamento.addActionListener(e ->{
+    		controller.salvarPartida();
+    	});
 
         btnProximoJogador.addActionListener(e -> {
+        	btnSalvamento.setEnabled(true);
         	controller.zeraRodadas();
             this.controller.proximaRodada();
             btnLancarDados.setEnabled(true);

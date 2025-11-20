@@ -1,9 +1,16 @@
 package game;
+
 import game.observer.Observavel;
+
+import game.persistencia.EstadoJogador;
+import game.persistencia.EstadoJogo;
+import game.persistencia.SaveManager;
 import eventos.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Fachada extends Observavel {
 
@@ -395,4 +402,102 @@ public class Fachada extends Observavel {
         }
         return 0; 
     }
+    
+    
+    // === SALVAMENTO/CARREGAMENTO ===
+    
+    public boolean salvarJogo(File arquivo) throws Exception {
+        try {
+            EstadoJogo estado = this.gerarEstado();
+            SaveManager.salvar(estado, arquivo); 
+            return true;
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o jogo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean carregarJogo(File arquivo) throws Exception {
+        try {
+            // Lê o estado salvo do arquivo
+            EstadoJogo estado = SaveManager.carregar(arquivo);
+            
+            // Restaura o estado no jogo atual
+            this.restaurarEstado(estado);
+            
+            return true;
+        } catch (IOException e) {
+            System.out.println("Erro ao carregar o jogo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (ClassNotFoundException e) {
+            System.out.println("Erro ao interpretar o arquivo salvo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    // Salvar estado
+    public EstadoJogo gerarEstado() {
+        EstadoJogo estado = new EstadoJogo();
+
+        estado.indiceJogadorAtual = indiceJogadorAtual;
+
+        for (Jogador j : jogadores) {
+            EstadoJogador ej = new EstadoJogador();
+
+            ej.numero = j.getNumero_jogador();
+            ej.cor = j.getCor();
+            ej.dinheiro = j.getDinheiro();
+            ej.posicao = j.getPosicao();
+            ej.preso = j.isPreso();
+            ej.habeas = j.temHabeasCorpus();
+
+            ej.propriedades = new ArrayList<String>(j.getIdPropriedades());
+            ej.companhias = new ArrayList<Integer>(j.getIdCompanhias());
+
+            estado.jogadores.add(ej);
+        }
+
+        return estado;
+    }
+    
+    // Carregar estado
+    public void restaurarEstado(EstadoJogo estado) {
+
+        jogadores.clear();
+
+        for (EstadoJogador ej : estado.jogadores) {
+            Jogador j = new Jogador(ej.numero, ej.cor);
+            j.setDinheiro(ej.dinheiro);
+            j.setPosicao(ej.posicao);
+            j.setPreso(ej.preso);
+
+            if (ej.habeas)
+                j.addHabeasCorpus();
+
+            // Restaurar propriedades usando ID
+            for (String id : ej.propriedades) {
+                CardPropriedade p = tabuleiro.getPropriedadePorId(id);
+                j.adicionarPropriedade(p); // Tem que ver se tem set
+                p.setDono(j);
+            }
+
+            // Restaurar companhias
+            for (int id : ej.companhias) {
+                CardCompanhia c = tabuleiro.getCompanhiaPorId(id);
+                j.adicionarCompanhia(c);
+                c.setDono(j);
+            }
+
+            jogadores.add(j);
+        }
+
+        indiceJogadorAtual = estado.indiceJogadorAtual;
+    }
+
+
 }
+
