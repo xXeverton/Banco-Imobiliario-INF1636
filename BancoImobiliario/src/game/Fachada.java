@@ -230,13 +230,7 @@ public class Fachada extends Observavel {
     	Jogador j = getJogadorAtual();
         banco.premiacaoJogador(j);
     }
-
-    public boolean venderTituloParaJogador(){
-        Jogador j = getJogadorAtual();
-        CardTitulo titulo = (CardTitulo) this.casaAtual;
-    	return banco.venderTituloParaJogador(j, titulo);
-    }
-
+    
     public boolean construirCasaParaJogador() {
     	Jogador j = getJogadorAtual();
     	CardPropriedade p = (CardPropriedade) this.casaAtual;
@@ -346,14 +340,8 @@ public class Fachada extends Observavel {
     public boolean processarTituloCasaAtual() {
         Casa casa = this.casaAtual;
         Jogador j = getJogadorAtual();
-        if (casa instanceof CardTitulo prop) {
-        	if (j.getDinheiro()>prop.getValor()) {
-        		prop.setDono(j);
-        		j.debito(prop.getValor());
-        		return true;
-        	} else {
-        		return false;
-        	}
+        if (casa instanceof CardTitulo titulo) {
+        	return banco.venderTituloParaJogador(j, titulo);
         } else {
         	return false;
         }

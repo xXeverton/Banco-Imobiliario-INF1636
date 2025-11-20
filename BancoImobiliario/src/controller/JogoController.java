@@ -196,7 +196,6 @@ public class JogoController {
     public void notificarInfos(int indice) {
     	f.notificarInfos(indice);
     }
-}
     
     // Salvamento         
         public void salvarPartida() {
