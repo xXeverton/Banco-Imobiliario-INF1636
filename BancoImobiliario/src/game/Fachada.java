@@ -1,11 +1,16 @@
 package game;
+
 import game.observer.Observavel;
+
 import game.persistencia.EstadoJogador;
 import game.persistencia.EstadoJogo;
+import game.persistencia.SaveManager;
 import eventos.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Fachada extends Observavel {
 
@@ -401,6 +406,39 @@ public class Fachada extends Observavel {
     
     // === SALVAMENTO/CARREGAMENTO ===
     
+    public boolean salvarJogo(File arquivo) throws Exception {
+        try {
+            EstadoJogo estado = this.gerarEstado();
+            SaveManager.salvar(estado, arquivo); 
+            return true;
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o jogo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean carregarJogo(File arquivo) throws Exception {
+        try {
+            // Lê o estado salvo do arquivo
+            EstadoJogo estado = SaveManager.carregar(arquivo);
+            
+            // Restaura o estado no jogo atual
+            this.restaurarEstado(estado);
+            
+            return true;
+        } catch (IOException e) {
+            System.out.println("Erro ao carregar o jogo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (ClassNotFoundException e) {
+            System.out.println("Erro ao interpretar o arquivo salvo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
     // Salvar estado
     public EstadoJogo gerarEstado() {
         EstadoJogo estado = new EstadoJogo();
@@ -417,13 +455,8 @@ public class Fachada extends Observavel {
             ej.preso = j.isPreso();
             ej.habeas = j.temHabeasCorpus();
 
-            ej.propriedades = j.getPropriedades().stream()
-                    .map(CardPropriedade::getIdImage)
-                    .toList();
-
-            ej.companhias = j.getCompanhias().stream()
-                    .map(CardCompanhia::getIdImage)
-                    .toList();
+            ej.propriedades = new ArrayList<String>(j.getIdPropriedades());
+            ej.companhias = new ArrayList<Integer>(j.getIdCompanhias());
 
             estado.jogadores.add(ej);
         }
