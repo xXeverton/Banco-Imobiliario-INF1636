@@ -1,5 +1,7 @@
 package game;
 import game.observer.Observavel;
+import game.persistencia.EstadoJogador;
+import game.persistencia.EstadoJogo;
 import eventos.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -362,4 +364,74 @@ public class Fachada extends Observavel {
         }
         return 0; 
     }
+    
+    
+    // === SALVAMENTO/CARREGAMENTO ===
+    
+    // Salvar estado
+    public EstadoJogo gerarEstado() {
+        EstadoJogo estado = new EstadoJogo();
+
+        estado.indiceJogadorAtual = indiceJogadorAtual;
+
+        for (Jogador j : jogadores) {
+            EstadoJogador ej = new EstadoJogador();
+
+            ej.numero = j.getNumero_jogador();
+            ej.cor = j.getCor();
+            ej.dinheiro = j.getDinheiro();
+            ej.posicao = j.getPosicao();
+            ej.preso = j.isPreso();
+            ej.habeas = j.temHabeasCorpus();
+
+            ej.propriedades = j.getPropriedades().stream()
+                    .map(CardPropriedade::getIdImage)
+                    .toList();
+
+            ej.companhias = j.getCompanhias().stream()
+                    .map(CardCompanhia::getIdImage)
+                    .toList();
+
+            estado.jogadores.add(ej);
+        }
+
+        return estado;
+    }
+    
+    // Carregar estado
+    public void restaurarEstado(EstadoJogo estado) {
+
+        jogadores.clear();
+
+        for (EstadoJogador ej : estado.jogadores) {
+            Jogador j = new Jogador(ej.numero, ej.cor);
+            j.setDinheiro(ej.dinheiro);
+            j.setPosicao(ej.posicao);
+            j.setPreso(ej.preso);
+
+            if (ej.habeas)
+                j.addHabeasCorpus();
+
+            // Restaurar propriedades usando ID
+            for (String id : ej.propriedades) {
+                CardPropriedade p = tabuleiro.getPropriedadePorId(id);
+                j.adicionarPropriedade(p); // Tem que ver se tem set
+                p.setDono(j);
+            }
+
+            // Restaurar companhias
+            for (int id : ej.companhias) {
+                CardCompanhia c = tabuleiro.getCompanhiaPorId(id);
+                j.adicionarCompanhia(c);
+                c.setDono(j);
+            }
+
+            jogadores.add(j);
+        }
+
+        indiceJogadorAtual = estado.indiceJogadorAtual;
+    }
+
+
 }
+

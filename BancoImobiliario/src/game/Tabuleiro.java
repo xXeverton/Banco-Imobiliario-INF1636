@@ -78,5 +78,29 @@ public class Tabuleiro {
         Casa casa = casas.get(novaPosicao);
         return casa;
     }
+    
+ // ===== Recupera propriedade pelo "ID" (nome) =====
+    public CardPropriedade getPropriedadePorId(String nome) {
+        for (Casa c : casas) {
+            if (c instanceof CardPropriedade p) {
+                if (p.getNome().equals(nome)) {
+                    return p;
+                }
+            }
+        }
+        return null; // não encontrou
+    }
+
+    // ===== Recupera companhia pelo ID (idImage) =====
+    public CardCompanhia getCompanhiaPorId(int id) {
+        for (Casa c : casas) {
+            if (c instanceof CardCompanhia comp) {
+                if (comp.getIdImage() == id) {
+                    return comp;
+                }
+            }
+        }
+        return null; // não encontrou
+    }
 
 }

@@ -44,7 +44,7 @@ public class Jogador {
 		return dinheiro;
 	}
 	
-	public void setDinheiro(int dinheiro) {
+	public void setDinheiro(double dinheiro) {
 		this.dinheiro = dinheiro;
 	}
 
