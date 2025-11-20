@@ -15,6 +15,7 @@ public class JogoView extends JFrame implements Observador{
     private final TabuleiroView tabuleiroView = new TabuleiroView();
     private final JButton btnLancarDados = new JButton("🎲 Lançar Dados");
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
+    private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
     private JPanel painelAcoesCarta = new JPanel();
@@ -153,6 +154,16 @@ public class JogoView extends JFrame implements Observador{
                 tabuleiroView.setarPosicaoJogadorPartida(indice);
             }
             
+            case "ATUALIZAR_INFOS_JOGADOR" ->{
+                double dinheiro = (double) evento.get("dinheiro");
+                ArrayList<String> propriedades = (ArrayList<String>) evento.get("propriedades");
+                ArrayList<Integer> companhias = (ArrayList<Integer>) evento.get("companhias");
+                boolean habeas = (boolean) evento.get("temHabeasCorpus");
+                String cor = (String) evento.get("cor");
+
+                // atualizarPainelJogador(dinheiro, propriedades, companhias, habeas, cor);
+                break;
+            }
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
@@ -281,6 +292,7 @@ public class JogoView extends JFrame implements Observador{
         }
         // 🔹 Inicializa pinos no tabuleiro
         tabuleiroView.inicializarPinos(numJogadores);
+        criarBotoesJogadores(numJogadores);
 
         lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
     }
@@ -386,6 +398,31 @@ public class JogoView extends JFrame implements Observador{
         });
     }
 
+    public void criarBotoesJogadores(int numJogadores) {
+        System.out.println("--- " + numJogadores + " ---");
+        setLayout(null); // importante para posicionar manualmente
+
+        botoesJogadores.clear();
+
+        for (int i = 0; i < numJogadores; i++) {
+            JButton btn = new JButton("J" + (i + 1));
+
+            btn.setBounds(130, 250 + (i * 60), 240, 50); // mesma posição desenhada
+            btn.setOpaque(false);
+            btn.setContentAreaFilled(true);
+            btn.setBorderPainted(true);
+
+            final int jogadorIndex = i;
+
+            //btn.addActionListener(e -> abrirJanelaJogador(jogadorIndex));
+            
+            botoesJogadores.add(btn);
+            add(btn);
+        }
+
+        repaint();
+    }
+    
     private Color corPara(String corNome) {
         switch (corNome.toLowerCase()) {
             case "vermelho": return Color.RED;

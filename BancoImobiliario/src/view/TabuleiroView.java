@@ -19,6 +19,7 @@ public class TabuleiroView extends JPanel {
     private Color corJogadorAtual = Color.RED;
     private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
     private boolean exibirCarta = false; 
+    private int numJogadores;
     
     private int valorDado1 = 1;
     private int valorDado2 = 1;
@@ -42,6 +43,7 @@ public class TabuleiroView extends JPanel {
     public void inicializarPinos(int numJogadores) {
         imagensPinos = new ArrayList<>();
         posicoesPinos = new ArrayList<>();
+        this.numJogadores = numJogadores;
 
         // posição base (canto inferior direito, casa inicial)
         int baseX = 1125;
@@ -318,6 +320,11 @@ public class TabuleiroView extends JPanel {
             // Desenha a imagem da carta
             g2d.drawImage(imagemCartaSorteada, x, y, cardWidth, cardHeight, this);
         }
+        
+//        for (int i = 0; i < this.numJogadores; i++) {
+//        	g2d.setStroke(new BasicStroke(2));
+//            g2d.drawRoundRect(130, 250+(i*60), 240, 50, 20, 20);
+//        }
 
         g2d.dispose();
     }
