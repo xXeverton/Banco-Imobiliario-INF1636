@@ -4,6 +4,8 @@ import eventos.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import controller.JogoController;
 import game.observer.*;
@@ -19,7 +21,7 @@ public class JogoView extends JFrame implements Observador{
     private final JButton btnSalvamento = new JButton("Salvar Jogo 💾");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
-    private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
+    private List<String> cores = new ArrayList<>(Arrays.asList("vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"));
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
     private JPanel painelSuperior = new JPanel();
@@ -204,6 +206,40 @@ public class JogoView extends JFrame implements Observador{
                 // atualizarPainelJogador(dinheiro, propriedades, companhias, habeas, cor);
                 break;
             }
+            case "JOGADOR_FALIU" -> {
+                int index = (int) evento.get("indiceJogador");
+                this.numJogadores--;
+                
+                
+                JOptionPane.showMessageDialog(
+                        this,
+                        "O jogador " + cores.get(index) + " faliu e saiu do jogo!",
+                        "Jogador eliminado",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                cores.remove(index);
+                tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
+                
+                // 🔥 1. Remover botão do jogador
+                this.criarBotoesJogadores(numJogadores);
+                
+                // 🔥 3. Remover pino e reindexar pinos
+                tabuleiroView.removerPinoJogador(index);
+
+                // 🔥 5. Ajustar jogadorAtual
+                if (jogadorAtual >= numJogadores) {
+                    jogadorAtual = 0;
+                }
+
+                // 🔥 6. Atualizar interface
+                painelSuperior.revalidate();
+                painelSuperior.repaint();
+
+                controller.zeraRodadas();
+                btnLancarDados.setEnabled(true);
+                btnProximoJogador.setEnabled(false);
+            }
+
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
@@ -326,7 +362,7 @@ public class JogoView extends JFrame implements Observador{
 
         // Adiciona jogadores com cores fixas
         for (int i = 0; i < numJogadores; i++) {
-            String cor = cores[i];
+            String cor = cores.get(i);
             controller.adicionarJogador(i + 1, cor);
             System.out.println("Jogador " + (i + 1) + " será " + cor + ".");// <--
         }
@@ -413,9 +449,12 @@ public class JogoView extends JFrame implements Observador{
 
 			controller.verificarFalencia();
 			if (controller.getJogadores() == 1) {
-				lblStatus.setText("Jogador " + controller.getCorJogadorAtual() + " venceu!");
-				btnLancarDados.setEnabled(false);
-				btnProximoJogador.setEnabled(false);
+				for (JButton btn : botoesJogadores) {
+					btn.setEnabled(false);
+				}
+
+				String vencedor = controller.getCorJogadorAtual();
+			    exibirMensagemVencedor(vencedor);
 				return;
 			}
 
@@ -443,13 +482,38 @@ public class JogoView extends JFrame implements Observador{
         });
     }
 
+    private void exibirMensagemVencedor(String corVencedor) {
+        String mensagem = "O jogador " + corVencedor + " venceu a partida!\n\n"
+                        + "O que deseja fazer?";
+
+        Object[] opcoes = {"Novo Jogo", "Sair"};
+
+        int escolha = JOptionPane.showOptionDialog(
+                this,
+                mensagem,
+                "Fim de Jogo",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                opcoes,
+                opcoes[0]
+        );
+        if (escolha == 0) {
+            this.dispose();
+            controller.resetarJogo();
+            new JogoView();
+        } else {
+            System.exit(0);
+        }
+    }
+    
     public void criarBotoesJogadores(int numJogadores) {
         botoesJogadores.clear();
         painelSuperior.removeAll();
 
         for (int i = 0; i < numJogadores; i++) {
         	int index = i;
-            JButton btn = new JButton("Jogador " + cores[i]);
+            JButton btn = new JButton("Jogador " + cores.get(i));
             btn.setPreferredSize(new Dimension(150, 35)); // igual ao estilo da barra inferior
             
             btn.addActionListener(e -> {

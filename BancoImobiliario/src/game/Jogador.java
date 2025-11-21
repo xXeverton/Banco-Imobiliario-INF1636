@@ -15,7 +15,7 @@ public class Jogador {
 
 	public Jogador(int numero_jogador, String cor) {
 		this.numero_jogador = numero_jogador;
-		this.dinheiro = 4000;
+		this.dinheiro = 10;
 		this.propriedades = new ArrayList<>();
 		this.companhias = new ArrayList<>();
         this.preso = false;
@@ -69,13 +69,11 @@ public class Jogador {
 	        System.out.println("Jogador não possui dinheiro suficiente");
 	        return false;
 	    }
-	    System.out.println("compra propriedade");
 	    this.dinheiro -= titulo.getValor();
 	    titulo.setDono(this);
 
 	    // Adiciona o título na lista correta conforme o tipo
 	    if (titulo instanceof CardPropriedade propriedade) {
-	    	System.out.println("adiciona propriedade");
 	        this.propriedades.add(propriedade);
 	    } else if (titulo instanceof CardCompanhia companhia) {
 	        this.companhias.add(companhia);

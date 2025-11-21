@@ -271,6 +271,25 @@ public class TabuleiroView extends JPanel {
         repaint(); // redesenha a área dos dados com a nova cor
     }
     
+    public void removerPinoJogador(int indice) {
+        if (imagensPinos == null || posicoesPinos == null) return;
+        if (indice < 0 || indice >= imagensPinos.size()) return;
+
+        imagensPinos.remove(indice);
+        posicoesPinos.remove(indice);
+
+        // Recria o array de posições lógicas
+        int[] novo = new int[posicaoAtual.length - 1];
+        for (int i = 0, j = 0; i < posicaoAtual.length; i++) {
+            if (i != indice) {
+                novo[j++] = posicaoAtual[i];
+            }
+        }
+        posicaoAtual = novo;
+        repaint();
+    }
+
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

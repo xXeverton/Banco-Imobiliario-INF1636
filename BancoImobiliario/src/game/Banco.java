@@ -23,9 +23,10 @@ public class Banco {
 	
 	public boolean venderTituloParaJogador(Jogador jogador, CardTitulo titulo) {
 	    if (titulo.podeSerCompradoPor(jogador)) {
-	    	if (jogador.comprarTitulo(titulo));
+	    	if (jogador.comprarTitulo(titulo)) {
 		        this.dinheiro += titulo.getValor();
 		        return true;
+	    	}
 	    }
 	    return false;
 	}
