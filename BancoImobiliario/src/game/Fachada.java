@@ -56,8 +56,14 @@ public class Fachada extends Observavel {
 
     public Jogador getJogadorAtual() {
         if (jogadores.isEmpty()) return null;
+
+        if (indiceJogadorAtual >= jogadores.size()) {
+            indiceJogadorAtual = 0;
+        }
+
         return jogadores.get(indiceJogadorAtual);
     }
+
 
     public void proximoJogador() {
         if (!jogadores.isEmpty()) {
@@ -70,6 +76,11 @@ public class Fachada extends Observavel {
     }
     
     public void notificarInfos(int indice) {
+    	if (indice < 0 || indice >= jogadores.size()) {
+            System.out.println("Tentativa de acessar jogador inválido após falência!");
+            return;
+        }
+
         Jogador j = jogadores.get(indice);
 
         double dinheiro = j.getDinheiro();
@@ -326,10 +337,22 @@ public class Fachada extends Observavel {
     public void verificarFalencia() {
         Jogador j = getJogadorAtual();
         if (j.getDinheiro() < 0) {
+            int removido = indiceJogadorAtual;
+
             System.out.println("Jogador " + j.getCor() + " faliu e saiu do jogo!");
+
             jogadores.remove(j);
+
+            // 🔹 Notifica a view
+            EventoJogadorFaliu evento = new EventoJogadorFaliu(removido);
+            notificarObservadores(evento);
+
+            // ajustar índice
+            if (indiceJogadorAtual >= jogadores.size())
+                indiceJogadorAtual = 0;
         }
     }
+
     
     // == TITULO ==
     
@@ -486,6 +509,9 @@ public class Fachada extends Observavel {
         indiceJogadorAtual = estado.indiceJogadorAtual;
     }
 
+    public void resetarJogo() {
+        instancia = new Fachada();
+    }
 
 }
 

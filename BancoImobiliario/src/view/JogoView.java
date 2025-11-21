@@ -175,6 +175,21 @@ public class JogoView extends JFrame implements Observador{
                 // atualizarPainelJogador(dinheiro, propriedades, companhias, habeas, cor);
                 break;
             }
+            case "JOGADOR_FALIU" -> {
+                int index = (int) evento.get("indiceJogador");
+                JButton btn = botoesJogadores.get(index);
+                btn.setEnabled(false);
+                tabuleiroView.removerPinoJogador(index);
+                btnLancarDados.setEnabled(false);
+                btn.setText(btn.getText() + " ❌");
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "O jogador " + cores[index] + " faliu e saiu do jogo!",
+                        "Jogador eliminado",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
@@ -384,9 +399,12 @@ public class JogoView extends JFrame implements Observador{
 
 			controller.verificarFalencia();
 			if (controller.getJogadores() == 1) {
-				lblStatus.setText("Jogador " + controller.getCorJogadorAtual() + " venceu!");
-				btnLancarDados.setEnabled(false);
-				btnProximoJogador.setEnabled(false);
+				for (JButton btn : botoesJogadores) {
+					btn.setEnabled(false);
+				}
+
+				String vencedor = controller.getCorJogadorAtual();
+			    exibirMensagemVencedor(vencedor);
 				return;
 			}
 
@@ -414,6 +432,31 @@ public class JogoView extends JFrame implements Observador{
         });
     }
 
+    private void exibirMensagemVencedor(String corVencedor) {
+        String mensagem = "O jogador " + corVencedor + " venceu a partida!\n\n"
+                        + "O que deseja fazer?";
+
+        Object[] opcoes = {"Novo Jogo", "Sair"};
+
+        int escolha = JOptionPane.showOptionDialog(
+                this,
+                mensagem,
+                "Fim de Jogo",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                opcoes,
+                opcoes[0]
+        );
+        if (escolha == 0) {
+            this.dispose();
+            controller.resetarJogo();
+            new JogoView();
+        } else {
+            System.exit(0);
+        }
+    }
+    
     public void criarBotoesJogadores(int numJogadores) {
         botoesJogadores.clear();
         painelSuperior.removeAll();

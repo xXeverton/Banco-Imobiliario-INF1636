@@ -59,6 +59,7 @@ public class JogoController {
 
     // Deslocar o jogador da vez
     public void moverJogador(int casas) {
+    	this.verificarFalencia();
     	this.casas = casas;
         // Pede pra fachada mover o jogador e retorna o tipo da casa
         var tipo = f.moverJogador(casas); // Novo método na Fachada
@@ -195,6 +196,10 @@ public class JogoController {
     
     public void notificarInfos(int indice) {
     	f.notificarInfos(indice);
+    }
+    
+    public void resetarJogo() {
+        f.resetarJogo();
     }
     
     // Salvamento         
