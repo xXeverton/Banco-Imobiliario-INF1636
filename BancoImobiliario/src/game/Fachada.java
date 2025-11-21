@@ -362,4 +362,43 @@ public class Fachada extends Observavel {
         }
         return 0; 
     }
+    
+    
+    
+    public boolean salvarJogo(java.io.File arquivo) {
+        System.out.println("Fachada: Solicitando salvamento no arquivo: " + arquivo.getAbsolutePath());
+        // TODO: implementa a escrita no arquivo aqui
+        return true; // Retorna true para simular sucesso por enquanto
+    }
+
+    public boolean carregarJogo(java.io.File arquivo) {
+        System.out.println("Fachada: Solicitando carregamento do arquivo: " + arquivo.getAbsolutePath());
+        // TODO:implementa a leitura do arquivo aqui
+        return true; 
+    }
+
+    // Lógica para definir o vencedor ao encerrar o jogo
+    public String apurarVencedor() {
+        if (jogadores.isEmpty()) return "Nenhum jogador";
+        
+        Jogador vencedor = jogadores.get(0);
+        double maiorPatrimonio = calcularPatrimonio(vencedor);
+
+        for (Jogador j : jogadores) {
+            double patrimonioJ = calcularPatrimonio(j);
+            if (patrimonioJ > maiorPatrimonio) {
+                maiorPatrimonio = patrimonioJ;
+                vencedor = j;
+            }
+        }
+        return "Vencedor: " + vencedor.getCor() + " com patrimônio de $" + maiorPatrimonio;
+    }
+
+    private double calcularPatrimonio(Jogador j) {
+        // Soma dinheiro + valor das propriedades (simplificado)
+        // Você pode expandir isso para somar valor de casas/hotéis se quiser ser preciso
+        double patrimonio = j.getDinheiro();
+        // Se tiver acesso às listas de propriedades no jogador, some aqui.
+        return patrimonio;
+    }
 }

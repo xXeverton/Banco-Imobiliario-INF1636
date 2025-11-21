@@ -10,28 +10,41 @@ import game.observer.*;
 
 public class JogoView extends JFrame implements Observador{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
     private final JogoController controller = new JogoController();
     private final TabuleiroView tabuleiroView = new TabuleiroView();
+
+    
+    // Botões
     private final JButton btnLancarDados = new JButton("🎲 Lançar Dados");
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
+    private final JButton btnSalvamento = new JButton("Salvar Jogo 💾"); 
+    
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
+    
+    // Painéis
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
-    // add modo testador
+    
+    // Modo Testador
     private JCheckBox chkModoTeste;
     private JComboBox<Integer> comboDado1;
     private JComboBox<Integer> comboDado2;
     private JLabel lblDado1, lblDado2;
-    // modo testador Sorte ou Reves
     private JCheckBox chkModoTesteCartas;
     private JComboBox<Integer> comboCartaId;
     private JLabel lblCarta;
 
-
     private int numJogadores;
     private int jogadorAtual = 0;
+    
+    private JMenuBar menuBar;
+    private JMenu menuArquivo;
+    private JMenuItem itemSalvar;
+    private JMenuItem itemCarregar;
+    private JMenuItem itemSair;
+   
     
     // 🔹 Construtor
     public JogoView() {
@@ -64,7 +77,7 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(lblDado2);
         painelBotoes.add(comboDado2);
         
-     // 🔹 Painel Modo testador de cartas sorte ou reves
+        // 🔹 Painel Modo testador de cartas sorte ou reves
         lblCarta = new JLabel("Carta ID:");
         
         //
@@ -99,11 +112,51 @@ public class JogoView extends JFrame implements Observador{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         configurarListeners();
+        
+        controller.setView(this); // Permite ao controller desabilitar botões aqui
+        controller.adicionarObservador(this);
 
+        configurarMenu();
         setVisible(true);
         
-        controller.adicionarObservador(this);
         this.iniciarJogo();
+    }
+    
+    private void configurarMenu() {
+        menuBar = new JMenuBar();
+        menuArquivo = new JMenu("⚙️Opções");
+
+        // Item Salvar
+        itemSalvar = new JMenuItem("Salvar Jogo");
+        itemSalvar.addActionListener(e -> controller.salvarPartida());
+
+        // Item Carregar
+        itemCarregar = new JMenuItem("Carregar Jogo");
+        itemCarregar.addActionListener(e -> controller.carregarPartida());
+
+        // Item Sair (Requisito: Apurar vencedor ao sair)
+        itemSair = new JMenuItem("Sair");
+        itemSair.addActionListener(e -> controller.encerrarJogo());
+
+        menuArquivo.add(itemSalvar);
+        menuArquivo.add(itemCarregar);
+        menuArquivo.addSeparator();
+        menuArquivo.add(itemSair);
+
+        menuBar.add(menuArquivo);
+        setJMenuBar(menuBar);
+    }
+    
+    
+    public void setSalvarEnabled(boolean b) { 
+        // Desabilita também o Botão do Painel Inferior
+        if(btnSalvamento != null) {
+            btnSalvamento.setEnabled(b);
+        }
+    }
+
+    public JogoController getController() {
+        return controller;
     }
     
     @Override
@@ -384,6 +437,10 @@ public class JogoView extends JFrame implements Observador{
             lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
             tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
         });
+        
+        btnSalvamento.addActionListener(e -> {
+            controller.salvarPartida();
+        });
     }
 
     private Color corPara(String corNome) {
@@ -444,8 +501,8 @@ public class JogoView extends JFrame implements Observador{
     
     // 🔹 Método main para rodar o jogo
 	
-	  public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
-	  JogoView()); }
+//	  public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
+//	  JogoView()); }
 	 
 	 
 }

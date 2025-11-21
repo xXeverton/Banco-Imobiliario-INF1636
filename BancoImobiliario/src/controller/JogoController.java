@@ -2,15 +2,24 @@ package controller;
 
 import game.Fachada;
 import game.observer.*;
-
+import view.JogoView;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 import java.util.ArrayList;
+
 
 public class JogoController {
     private Fachada f;
     private int casas;
     private int rodadas_jogador = 0;
+    private JogoView view;
     public JogoController() {
         this.f = Fachada.getInstancia();  // Singleton
+    }
+    
+    public void setView(JogoView view) {
+        this.view = view;
     }
     
     public void adicionarObservador(Observador o) {
@@ -31,8 +40,20 @@ public class JogoController {
     }
 
     public ArrayList<Integer> lancarDados() {
-    	ArrayList<Integer> valores = f.lancarDados();
-    	
+        // REGRA: "Após um jogador começar... o botão de salvamento DEVE ser desabilitado"
+        if (view != null) {
+            view.setSalvarEnabled(false);
+        }
+        
+        ArrayList<Integer> valores;
+        
+        // Lógica do modo teste (preservada)
+        if (view != null && view.isModoTeste()) {
+             valores = f.lancarDados();
+        } else {
+             valores = f.lancarDados();
+        }
+        
         System.out.println("Jogador " + f.getJogadorAtual() + " tirou " + valores.get(0) + "," + valores.get(1));
         return valores;
     }
@@ -185,6 +206,64 @@ public class JogoController {
 
     public void proximaRodada() {
         f.proximoJogador();
+        if (view != null) {
+            view.setSalvarEnabled(true);
+        }
+    }
+    
+    public void salvarPartida() {
+        // Requisito 4ª Iteração: JFileChooser
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Salvar Jogo");
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo de Texto (*.txt)", "txt"));
+
+        int resposta = fc.showSaveDialog(view);
+        if (resposta == JFileChooser.APPROVE_OPTION) {
+            File arquivo = fc.getSelectedFile();
+            if (!arquivo.getName().toLowerCase().endsWith(".txt")) {
+                arquivo = new File(arquivo.getAbsolutePath() + ".txt");
+            }
+            
+            // Delega para a fachada (onde seu colega vai trabalhar)
+            try {
+                boolean salvo = f.salvarJogo(arquivo);
+                if (salvo) {
+                    JOptionPane.showMessageDialog(view, "Jogo salvo com sucesso (Simulação) em:\n" + arquivo.getName());
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(view, "Erro ao salvar: " + e.getMessage());
+            }
+        }
+    }
+    
+    public void carregarPartidaPeloArquivo(File arquivo) {
+        try {
+            boolean carregado = f.carregarJogo(arquivo);
+            if (carregado) {
+                JOptionPane.showMessageDialog(view, "Jogo carregado com sucesso!");
+                if (view != null) view.repaint();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(view, "Erro ao carregar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void carregarPartida() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Carregar Jogo");
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo de Texto (*.txt)", "txt"));
+
+        int resposta = fc.showOpenDialog(view);
+        if (resposta == JFileChooser.APPROVE_OPTION) {
+            carregarPartidaPeloArquivo(fc.getSelectedFile());
+        }
+    }
+    
+    // Novo método para o botão "Sair" do Menu
+    public void encerrarJogo() {
+        String resultado = f.apurarVencedor();
+        JOptionPane.showMessageDialog(view, "O jogo foi encerrado!\n" + resultado);
+        System.exit(0);
     }
     
     public void incrementaRodadas() {
