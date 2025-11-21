@@ -114,7 +114,6 @@ public class JogoView extends JFrame implements Observador{
 
         setVisible(true);
         
-        controller.adicionarObservador(this);
         //this.iniciarJogo();
         controller.adicionarObservador(this);
         inicializarInterfacePeloEstadoAtual();
