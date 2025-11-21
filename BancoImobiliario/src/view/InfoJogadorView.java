@@ -7,8 +7,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 public class InfoJogadorView extends JFrame {
-
-    private JLabel lblCor;
+	private static final long serialVersionUID = 1L;
+	private JLabel lblCor;
     private JLabel lblDinheiro;
     private JTextArea txtPropriedades;
     private JTextArea txtCompanhias;
