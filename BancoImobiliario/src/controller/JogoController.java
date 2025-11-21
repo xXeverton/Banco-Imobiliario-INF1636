@@ -245,6 +245,10 @@ public class JogoController {
             }
         }
         
+        public ArrayList<String> getCorJogadores(){
+        	return f.getCorJogadores();
+        }
+        
 
         public void carregarPartidaArquivo(File arquivo) throws Exception {
             // Chama a fachada diretamente passando o arquivo selecionado na View
@@ -254,11 +258,6 @@ public class JogoController {
                 throw new Exception("Falha ao interpretar arquivo de salvamento.");
             }
             // Se carregou com sucesso, o estado do jogo (Singleton) já está atualizado
-        }
-        
-        // Para limpar o Singleton antes de um novo jogo
-        public void reiniciarJogo() {
-            f.reiniciarJogo();
         }
 
         // Para saber onde desenhar o pino ao carregar o jogo

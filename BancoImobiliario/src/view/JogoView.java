@@ -21,7 +21,7 @@ public class JogoView extends JFrame implements Observador{
     private final JButton btnSalvamento = new JButton("Salvar Jogo 💾");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
-    private List<String> cores = new ArrayList<>(Arrays.asList("vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"));
+    private List<String> cores;
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
     private JPanel painelSuperior = new JPanel();
@@ -40,9 +40,9 @@ public class JogoView extends JFrame implements Observador{
     private int jogadorAtual = 0;
     
     // 🔹 Construtor
-    public JogoView() {
+    public JogoView(ArrayList<String> cores) {
         super("Banco Imobiliário");
-
+        this.cores = cores;
         setLayout(new BorderLayout());
         add(tabuleiroView, BorderLayout.CENTER);
 
@@ -341,37 +341,37 @@ public class JogoView extends JFrame implements Observador{
     }
 
     
-    private void iniciarJogo() {
-        numJogadores = 0;
-    	btnSalvamento.setEnabled(false);
-        // Caixa de diálogo gráfica para escolher quantidade
-        while (numJogadores < 2 || numJogadores > 6) {
-            String input = JOptionPane.showInputDialog(
-                this, "Quantos jogadores irão jogar? (2 a 6)", "Configuração Inicial", JOptionPane.QUESTION_MESSAGE
-            );
-            if (input == null) {
-                JOptionPane.showMessageDialog(this, "Jogo cancelado.");
-                System.exit(0);
-            }
-            try {
-                numJogadores = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                numJogadores = 0;
-            }
-        }
-
-        // Adiciona jogadores com cores fixas
-        for (int i = 0; i < numJogadores; i++) {
-            String cor = cores.get(i);
-            controller.adicionarJogador(i + 1, cor);
-            System.out.println("Jogador " + (i + 1) + " será " + cor + ".");// <--
-        }
-        // 🔹 Inicializa pinos no tabuleiro
-        tabuleiroView.inicializarPinos(numJogadores);
-        criarBotoesJogadores(numJogadores);
-
-        lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
-    }
+//    private void iniciarJogo() {
+//        numJogadores = 0;
+//    	btnSalvamento.setEnabled(false);
+//        // Caixa de diálogo gráfica para escolher quantidade
+//        while (numJogadores < 2 || numJogadores > 6) {
+//            String input = JOptionPane.showInputDialog(
+//                this, "Quantos jogadores irão jogar? (2 a 6)", "Configuração Inicial", JOptionPane.QUESTION_MESSAGE
+//            );
+//            if (input == null) {
+//                JOptionPane.showMessageDialog(this, "Jogo cancelado.");
+//                System.exit(0);
+//            }
+//            try {
+//                numJogadores = Integer.parseInt(input);
+//            } catch (NumberFormatException e) {
+//                numJogadores = 0;
+//            }
+//        }
+//
+//        // Adiciona jogadores com cores fixas
+//        for (int i = 0; i < numJogadores; i++) {
+//            String cor = cores.get(i);
+//            controller.adicionarJogador(i + 1, cor);
+//            System.out.println("Jogador " + (i + 1) + " será " + cor + ".");// <--
+//        }
+//        // 🔹 Inicializa pinos no tabuleiro
+//        tabuleiroView.inicializarPinos(numJogadores);
+//        criarBotoesJogadores(numJogadores);
+//
+//        lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
+//    }
     private void configurarListeners() {
     	
     	// Listener do Modo Teste
@@ -400,6 +400,7 @@ public class JogoView extends JFrame implements Observador{
 
     	btnLancarDados.addActionListener(e -> {
     		btnSalvamento.setEnabled(false);
+    		btnProximoJogador.setEnabled(true);
 			boolean modoTeste = this.isModoTeste();
 			controller.setModoTeste(modoTeste);
 			
@@ -469,6 +470,7 @@ public class JogoView extends JFrame implements Observador{
 
         btnProximoJogador.addActionListener(e -> {
         	btnSalvamento.setEnabled(true);
+        	btnProximoJogador.setEnabled(false);
         	controller.zeraRodadas();
             this.controller.proximaRodada();
             btnLancarDados.setEnabled(true);
@@ -501,7 +503,8 @@ public class JogoView extends JFrame implements Observador{
         if (escolha == 0) {
             this.dispose();
             controller.resetarJogo();
-            new JogoView();
+            ArrayList<String> cores = new ArrayList<>(Arrays.asList("vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"));
+            new JogoView(cores);
         } else {
             System.exit(0);
         }

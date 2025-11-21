@@ -4,6 +4,7 @@ import controller.JogoController;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 
 public class MenuInicialView extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -70,7 +71,7 @@ public class MenuInicialView extends JFrame {
     }
 
     private void configurarNovoJogo() {
-        controller.reiniciarJogo(); 
+        controller.resetarJogo(); 
 
         // Lógica original de pedir jogadores
         String input = JOptionPane.showInputDialog(this, "Quantos jogadores? (2 a 6)");
@@ -93,7 +94,8 @@ public class MenuInicialView extends JFrame {
     }
 
     private void abrirJogoView() {
-        SwingUtilities.invokeLater(() -> new JogoView());
+    	ArrayList<String> cores = controller.getCorJogadores();
+        SwingUtilities.invokeLater(() -> new JogoView(cores));
     }
 
     public static void main(String[] args) {

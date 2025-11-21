@@ -1,13 +1,17 @@
 package view;
 
+import controller.JogoController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.imageio.ImageIO;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.awt.Point;
+
 
 public class TabuleiroView extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -19,6 +23,8 @@ public class TabuleiroView extends JPanel {
     private Color corJogadorAtual = Color.RED;
     private BufferedImage imagemCartaSorteada; // NOVO CAMPO: Imagem da carta sorteada
     private boolean exibirCarta = false;
+    private Map<String, BufferedImage> imagensPorCor;
+    private JogoController controller = new JogoController();
     
     private int valorDado1 = 1;
     private int valorDado2 = 1;
@@ -33,6 +39,13 @@ public class TabuleiroView extends JPanel {
             imagemTabuleiro = ImageIO.read(getClass().getResource("/view/imagens/tabuleiro.png"));
             dado1Img = ImageIO.read(getClass().getResource("/view/imagens/dados/die_face_1.png"));
             dado2Img = ImageIO.read(getClass().getResource("/view/imagens/dados/die_face_1.png"));
+            imagensPorCor = new HashMap<>();
+            imagensPorCor.put("vermelho", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin0.png")));
+            imagensPorCor.put("azul", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin1.png")));
+            imagensPorCor.put("laranja", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin2.png")));
+            imagensPorCor.put("amarelo", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin3.png")));
+            imagensPorCor.put("roxo", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin4.png")));
+            imagensPorCor.put("cinza", ImageIO.read(getClass().getResource("/view/imagens/pinos/pin5.png")));
         } catch (IOException | IllegalArgumentException e) {
             System.err.println("Erro ao carregar imagens: " + e.getMessage());
             imagemTabuleiro = null;
@@ -318,7 +331,8 @@ public class TabuleiroView extends JPanel {
         // --- Desenha os pinos ---
         if (imagensPinos != null) {
             for (int i = 0; i < imagensPinos.size(); i++) {
-                BufferedImage pino = imagensPinos.get(i);
+            	String corJogador = controller.getCorJogadores().get(i);
+            	BufferedImage pino = imagensPorCor.get(corJogador);
                 if (pino != null && posicoesPinos != null) {
                     Point p = posicoesPinos.get(i);
                     g2d.drawImage(pino, p.x, p.y, 30, 30, this);

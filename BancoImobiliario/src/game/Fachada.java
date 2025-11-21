@@ -506,12 +506,20 @@ public class Fachada extends Observavel {
 
         indiceJogadorAtual = estado.indiceJogadorAtual;
     }
+    
+    public ArrayList<String> getCorJogadores() {
+        ArrayList<String> cores = new ArrayList<>();
+
+        for (Jogador j : jogadores) {
+            cores.add(j.getCor());
+        }
+
+        return cores;
+    }
+
 
     public void resetarJogo() {
         instancia = new Fachada();
-    public void reiniciarJogo() {
-        this.jogadores.clear();
-        this.indiceJogadorAtual = 0;
     }
 
 }
