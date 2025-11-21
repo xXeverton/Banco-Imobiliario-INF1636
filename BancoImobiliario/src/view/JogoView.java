@@ -182,13 +182,24 @@ public class JogoView extends JFrame implements Observador{
                 tabuleiroView.removerPinoJogador(index);
                 btnLancarDados.setEnabled(false);
                 btn.setText(btn.getText() + " ❌");
-
+                
                 JOptionPane.showMessageDialog(
                         this,
                         "O jogador " + cores[index] + " faliu e saiu do jogo!",
                         "Jogador eliminado",
                         JOptionPane.WARNING_MESSAGE
                 );
+                
+                controller.zeraRodadas();
+//                controller.proximaRodada();
+                
+                String cor = controller.getCorJogadorAtual();
+                double dinheiro = controller.getDinheiroJogadorAtual();
+
+                System.out.println("--- Próxima Rodada: Jogador " + cor + " | Saldo Atual: R$" + dinheiro + " ---");
+
+//                btnProximoJogador.setEnabled(false);
+                btnLancarDados.setEnabled(true);
             }
             default -> System.out.println("Evento não tratado: " + evento);
         }

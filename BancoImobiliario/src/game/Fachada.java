@@ -347,10 +347,8 @@ public class Fachada extends Observavel {
             EventoJogadorFaliu evento = new EventoJogadorFaliu(removido);
             notificarObservadores(evento);
 
-            // ajustar índice
-            if (indiceJogadorAtual >= jogadores.size())
-                indiceJogadorAtual = 0;
-        }
+            System.out.println("Indice atual " + indiceJogadorAtual);
+      }
     }
 
     
