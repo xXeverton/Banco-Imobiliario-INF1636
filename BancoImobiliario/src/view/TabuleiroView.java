@@ -22,8 +22,6 @@ public class TabuleiroView extends JPanel {
     
     private int valorDado1 = 1;
     private int valorDado2 = 1;
-    
-    private int ajusteY = 30; // Valor em pixels para empurrar tudo para baixo
 
     public TabuleiroView() {
         setBackground(new Color(230, 230, 230));
@@ -47,7 +45,7 @@ public class TabuleiroView extends JPanel {
 
         // posição base (canto inferior direito, casa inicial)
         int baseX = 1125;
-        int baseY = 605+ajusteY;
+        int baseY = 605;
 
         int espacamento = 25;
 
@@ -142,7 +140,7 @@ public class TabuleiroView extends JPanel {
         switch (lado) {
             case 0: // Base inferior (direita → esquerda)
                 x = 1125;
-                y = 605+ajusteY;
+                y = 605;
                 primeiroPasso = 70;
                 passo = 55;
                 if (offset == 0) {
@@ -155,7 +153,7 @@ public class TabuleiroView extends JPanel {
 
             case 1: // Lado esquerdo (baixo → cima)
                 x = 530;
-                y = 600+ajusteY;
+                y = 600;
                 primeiroPasso = 70;
                 passo = 47;
                 if (offset == 0) {
@@ -168,7 +166,7 @@ public class TabuleiroView extends JPanel {
 
             case 2: // Topo (esquerda → direita)
                 x = 545;
-                y = 110+ajusteY;
+                y = 110;
                 primeiroPasso = 65;
                 passo = 55;
                 if (offset == 0) {
@@ -181,7 +179,7 @@ public class TabuleiroView extends JPanel {
 
             case 3: // Lado direito (cima → baixo)
                 x = 1115;
-                y = 100+ajusteY;
+                y = 100;
                 primeiroPasso = 60;
                 passo = 46;
                 if (offset == 0) {
@@ -283,7 +281,7 @@ public class TabuleiroView extends JPanel {
         if (imagemTabuleiro != null) {
             int x = (getWidth() - 575);
             int y = (getHeight() - 140);
-            g2d.drawImage(imagemTabuleiro, 520, 60+ajusteY, x, y, this);
+            g2d.drawImage(imagemTabuleiro, 520, 60, x, y, this);
         }
         // --- Desenha a área dos dados à esquerda ---
         g2d.setColor(new Color(240, 240, 240));
