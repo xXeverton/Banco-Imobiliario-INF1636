@@ -239,4 +239,25 @@ public class JogoController {
                 }
             }
         }
+        
+
+        public void carregarPartidaArquivo(File arquivo) throws Exception {
+            // Chama a fachada diretamente passando o arquivo selecionado na View
+            // A fachada deve lançar exceção se falhar, para a View exibir o erro
+            boolean sucesso = f.carregarJogo(arquivo);
+            if (!sucesso) {
+                throw new Exception("Falha ao interpretar arquivo de salvamento.");
+            }
+            // Se carregou com sucesso, o estado do jogo (Singleton) já está atualizado
+        }
+        
+        // Para limpar o Singleton antes de um novo jogo
+        public void reiniciarJogo() {
+            f.reiniciarJogo();
+        }
+
+        // Para saber onde desenhar o pino ao carregar o jogo
+        public int getPosicaoJogador(int indice) {
+            return f.getJogador(indice).getPosicao();
+        }
     }

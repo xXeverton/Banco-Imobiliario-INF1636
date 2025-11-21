@@ -114,8 +114,37 @@ public class JogoView extends JFrame implements Observador{
 
         setVisible(true);
         
+        //this.iniciarJogo();
         controller.adicionarObservador(this);
-        this.iniciarJogo();
+        inicializarInterfacePeloEstadoAtual();
+    }
+    
+    // Método atualizado para posicionar os pinos visualmente
+    private void inicializarInterfacePeloEstadoAtual() {
+        // CORREÇÃO: Remova o "int" para atualizar o atributo da classe, não criar uma variável local
+        this.numJogadores = controller.getJogadores(); 
+        
+        // Se por acaso o controller retornar 0 (ex: erro no carregamento), evitamos o crash
+        if (this.numJogadores == 0) return; 
+        
+        // 1. Cria os pinos visualmente (todos no início)
+        tabuleiroView.inicializarPinos(numJogadores);
+        
+        // 2. Recria os botões superiores
+        criarBotoesJogadores(numJogadores);
+        
+        // 3. Move os pinos para a posição correta
+        for(int i=0; i < numJogadores; i++) {
+            int posicaoSalva = controller.getPosicaoJogador(i);
+            if (posicaoSalva > 0) {
+                tabuleiroView.moverPino(i, posicaoSalva);
+            }
+        }
+
+        lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
+        
+        btnLancarDados.setEnabled(true);
+        btnSalvamento.setEnabled(true);
     }
     
     @Override
@@ -495,8 +524,10 @@ public class JogoView extends JFrame implements Observador{
     
     // 🔹 Método main para rodar o jogo
 	
-	  public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
-	  JogoView()); }
+	/*
+	 * public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
+	 * JogoView()); }
+	 */
 	 
 	 
 }
