@@ -179,38 +179,8 @@ public class JogoView extends JFrame implements Observador{
             }
             case "JOGADOR_FALIU" -> {
                 int index = (int) evento.get("indiceJogador");
-
-                // 🔥 1. Remover botão do jogador
-                JButton btn = botoesJogadores.get(index);
-                painelSuperior.remove(btn);
-                botoesJogadores.remove(index);
-
-                // 🔥 2. Reindexar listeners restantes
-                for (int i = 0; i < botoesJogadores.size(); i++) {
-                    int novoIndex = i;
-                    JButton b = botoesJogadores.get(i);
-
-                    for (var old : b.getActionListeners()) {
-                        b.removeActionListener(old);
-                    }
-
-                    b.addActionListener(x -> controller.notificarInfos(novoIndex));
-                }
-
-                // 🔥 3. Remover pino e reindexar pinos
-                tabuleiroView.removerPinoJogador(index);
-
-                // 🔥 4. Ajustar numJogadores
-                numJogadores = botoesJogadores.size();
-
-                // 🔥 5. Ajustar jogadorAtual
-                if (jogadorAtual >= numJogadores) {
-                    jogadorAtual = 0;
-                }
-
-                // 🔥 6. Atualizar interface
-                painelSuperior.revalidate();
-                painelSuperior.repaint();
+                this.numJogadores--;
+                
                 
                 JOptionPane.showMessageDialog(
                         this,
@@ -220,6 +190,21 @@ public class JogoView extends JFrame implements Observador{
                 );
                 cores.remove(index);
                 tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
+                
+                // 🔥 1. Remover botão do jogador
+                this.criarBotoesJogadores(numJogadores);
+                
+                // 🔥 3. Remover pino e reindexar pinos
+                tabuleiroView.removerPinoJogador(index);
+
+                // 🔥 5. Ajustar jogadorAtual
+                if (jogadorAtual >= numJogadores) {
+                    jogadorAtual = 0;
+                }
+
+                // 🔥 6. Atualizar interface
+                painelSuperior.revalidate();
+                painelSuperior.repaint();
 
                 controller.zeraRodadas();
                 btnLancarDados.setEnabled(true);
