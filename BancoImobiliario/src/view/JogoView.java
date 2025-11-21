@@ -4,6 +4,8 @@ import eventos.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import controller.JogoController;
 import game.observer.*;
@@ -19,7 +21,7 @@ public class JogoView extends JFrame implements Observador{
     private final JButton btnSalvamento = new JButton("Salvar Jogo 💾");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
-    private String[] cores = {"vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"};
+    private List<String> cores = new ArrayList<>(Arrays.asList("vermelho", "azul", "laranja", "amarelo", "roxo", "cinza"));
     private JPanel painelAcoesCarta = new JPanel();
     private JPanel painelBotoes = new JPanel();
     private JPanel painelSuperior = new JPanel();
@@ -177,30 +179,53 @@ public class JogoView extends JFrame implements Observador{
             }
             case "JOGADOR_FALIU" -> {
                 int index = (int) evento.get("indiceJogador");
+
+                // 🔥 1. Remover botão do jogador
                 JButton btn = botoesJogadores.get(index);
-                btn.setEnabled(false);
+                painelSuperior.remove(btn);
+                botoesJogadores.remove(index);
+
+                // 🔥 2. Reindexar listeners restantes
+                for (int i = 0; i < botoesJogadores.size(); i++) {
+                    int novoIndex = i;
+                    JButton b = botoesJogadores.get(i);
+
+                    for (var old : b.getActionListeners()) {
+                        b.removeActionListener(old);
+                    }
+
+                    b.addActionListener(x -> controller.notificarInfos(novoIndex));
+                }
+
+                // 🔥 3. Remover pino e reindexar pinos
                 tabuleiroView.removerPinoJogador(index);
-                btnLancarDados.setEnabled(false);
-                btn.setText(btn.getText() + " ❌");
+
+                // 🔥 4. Ajustar numJogadores
+                numJogadores = botoesJogadores.size();
+
+                // 🔥 5. Ajustar jogadorAtual
+                if (jogadorAtual >= numJogadores) {
+                    jogadorAtual = 0;
+                }
+
+                // 🔥 6. Atualizar interface
+                painelSuperior.revalidate();
+                painelSuperior.repaint();
                 
                 JOptionPane.showMessageDialog(
                         this,
-                        "O jogador " + cores[index] + " faliu e saiu do jogo!",
+                        "O jogador " + cores.get(index) + " faliu e saiu do jogo!",
                         "Jogador eliminado",
                         JOptionPane.WARNING_MESSAGE
                 );
-                
+                cores.remove(index);
+                tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
+
                 controller.zeraRodadas();
-//                controller.proximaRodada();
-                
-                String cor = controller.getCorJogadorAtual();
-                double dinheiro = controller.getDinheiroJogadorAtual();
-
-                System.out.println("--- Próxima Rodada: Jogador " + cor + " | Saldo Atual: R$" + dinheiro + " ---");
-
-//                btnProximoJogador.setEnabled(false);
                 btnLancarDados.setEnabled(true);
+                btnProximoJogador.setEnabled(false);
             }
+
             default -> System.out.println("Evento não tratado: " + evento);
         }
     }
@@ -323,7 +348,7 @@ public class JogoView extends JFrame implements Observador{
 
         // Adiciona jogadores com cores fixas
         for (int i = 0; i < numJogadores; i++) {
-            String cor = cores[i];
+            String cor = cores.get(i);
             controller.adicionarJogador(i + 1, cor);
             System.out.println("Jogador " + (i + 1) + " será " + cor + ".");// <--
         }
@@ -474,7 +499,7 @@ public class JogoView extends JFrame implements Observador{
 
         for (int i = 0; i < numJogadores; i++) {
         	int index = i;
-            JButton btn = new JButton("Jogador " + cores[i]);
+            JButton btn = new JButton("Jogador " + cores.get(i));
             btn.setPreferredSize(new Dimension(150, 35)); // igual ao estilo da barra inferior
             
             btn.addActionListener(e -> {
