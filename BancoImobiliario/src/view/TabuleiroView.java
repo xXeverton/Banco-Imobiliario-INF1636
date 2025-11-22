@@ -338,6 +338,11 @@ public class TabuleiroView extends JPanel {
         	int qtd = Math.min(imagensPinos.size(), posicoesPinos.size());
             for (int i = 0; i < qtd; i++) {
             	String corJogador = controller.getCorJogadores().get(i);
+            	System.out.println(
+                	    "imagensPinos=" + imagensPinos.size() +
+                	    " posicoesPinos=" + posicoesPinos.size() +
+                	    " coresJogadores=" + controller.getCorJogadores().size()
+                );
             	BufferedImage pino = imagensPorCor.get(corJogador);
                 if (pino != null && posicoesPinos != null) {
                     Point p = posicoesPinos.get(i);

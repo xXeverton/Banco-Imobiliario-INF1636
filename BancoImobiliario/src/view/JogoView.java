@@ -145,29 +145,6 @@ public class JogoView extends JFrame implements Observador{
         inicializarInterfacePeloEstadoAtual();
     }
     
-
-//    private void inicializarInterfacePeloEstadoAtual() {
-//        this.numJogadores = controller.getJogadores(); 
-//        
-//        
-//        if (this.numJogadores == 0) return; 
-//        
-//        tabuleiroView.inicializarPinos(numJogadores);
-//        
-//        criarBotoesJogadores(numJogadores);
-//        
-//        for(int i=0; i < numJogadores; i++) {
-//            int posicaoSalva = controller.getPosicaoJogador(i);
-//            if (posicaoSalva > 0) {
-//                tabuleiroView.moverPino(i, posicaoSalva);
-//            }
-//        }
-//
-//        lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
-//        
-//        btnLancarDados.setEnabled(true);
-//        btnSalvamento.setEnabled(true);
-//    }
     
     private void inicializarInterfacePeloEstadoAtual() {
         this.numJogadores = controller.getJogadores(); 
@@ -245,7 +222,9 @@ public class JogoView extends JFrame implements Observador{
             
             case "ATUALIZAR_INFOS_JOGADOR" ->{
                 double dinheiro = (double) evento.get("dinheiro");
+                @SuppressWarnings("unchecked")
                 ArrayList<String> propriedades = (ArrayList<String>) evento.get("propriedades");
+                @SuppressWarnings("unchecked")
                 ArrayList<Integer> companhias = (ArrayList<Integer>) evento.get("companhias");
                 boolean habeas = (boolean) evento.get("temHabeasCorpus");
                 String cor = (String) evento.get("cor");

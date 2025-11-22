@@ -295,11 +295,19 @@ public class Fachada extends Observavel {
     
     public void verificarFalencia() {
         Jogador j = getJogadorAtual();
-        if (j != null && j.getDinheiro() < 0) {
+        if (j.getDinheiro() < 0) {
+            int removido = indiceJogadorAtual;
+
+            System.out.println("Jogador " + j.getCor() + " faliu e saiu do jogo!");
+
             jogadores.remove(j);
-            if (indiceJogadorAtual >= jogadores.size()) indiceJogadorAtual = 0;
-            
-        }
+
+            // 🔹 Notifica a view
+            EventoJogadorFaliu evento = new EventoJogadorFaliu(removido);
+            notificarObservadores(evento);
+
+            System.out.println("Indice atual " + indiceJogadorAtual);
+      }
     }
     
     // == TÍTULOS E PROPRIEDADES ==
@@ -433,15 +441,21 @@ public class Fachada extends Observavel {
         jogadores.sort((j1, j2) -> Double.compare(j2.getDinheiro(), j1.getDinheiro()));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("🏆 FIM DE JOGO! 🏆\n\n");
-        
+		sb.append("🏆 FIM DE JOGO! 🏆\n\n");
+
         Jogador vencedor = jogadores.get(0);
         sb.append("VENCEDOR: ").append(vencedor.getCor())
           .append(" com R$ ").append(String.format("%.2f", vencedor.getDinheiro()))
           .append("\n\nClassificação Final:\n");
 
-    public void resetarJogo() {
-    	this.jogadores.clear();
-        this.indiceJogadorAtual = 0;
+        int pos = 1;
+        for (Jogador j : jogadores) {
+            sb.append(pos).append("º - ").append(j.getCor())
+              .append(" (R$ ").append(String.format("%.2f", j.getDinheiro())).append(")\n");
+            pos++;
+        }
+        return sb.toString();
     }
+
+    
 }
