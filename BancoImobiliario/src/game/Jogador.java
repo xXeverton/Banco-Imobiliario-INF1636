@@ -15,7 +15,7 @@ public class Jogador {
 
 	public Jogador(int numero_jogador, String cor) {
 		this.numero_jogador = numero_jogador;
-		this.dinheiro = 10;
+		this.dinheiro =4000; ;
 		this.propriedades = new ArrayList<>();
 		this.companhias = new ArrayList<>();
         this.preso = false;

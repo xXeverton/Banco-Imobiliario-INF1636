@@ -26,15 +26,12 @@ public class MenuInicialView extends JFrame {
         JButton btnNovoJogo = new JButton("Novo Jogo");
         JButton btnCarregarJogo = new JButton("Carregar Jogo");
 
-        // AÇÃO: NOVO JOGO
         btnNovoJogo.addActionListener(e -> {
-            // Fecha o menu
+
             dispose(); 
-            // Abre a configuração de jogadores (requisito da 2ª iteração)
             configurarNovoJogo(); 
         });
 
-        // AÇÃO: CARREGAR JOGO
         btnCarregarJogo.addActionListener(e -> {
             carregarJogo();
         });
@@ -50,17 +47,14 @@ public class MenuInicialView extends JFrame {
     private void carregarJogo() {
         JFileChooser fc = new JFileChooser();
         fc.setDialogTitle("Carregar Partida Salva");
-        // Requisito 4ª iteração: Filtro para .txt
         fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivo de Texto (*.txt)", "txt"));
 
         int resposta = fc.showOpenDialog(this);
         if (resposta == JFileChooser.APPROVE_OPTION) {
             File arquivo = fc.getSelectedFile();
             try {
-                // Chama o controller que já está implementado
                 controller.carregarPartidaArquivo(arquivo); 
                 
-                // Fecha menu e abre o jogo
                 dispose();
                 abrirJogoView();
                 
@@ -73,7 +67,6 @@ public class MenuInicialView extends JFrame {
     private void configurarNovoJogo() {
         controller.resetarJogo(); 
 
-        // Lógica original de pedir jogadores
         String input = JOptionPane.showInputDialog(this, "Quantos jogadores? (2 a 6)");
         if (input == null) return;
         

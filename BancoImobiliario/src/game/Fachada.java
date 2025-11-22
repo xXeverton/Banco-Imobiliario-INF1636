@@ -1,7 +1,6 @@
 package game;
 
 import game.observer.Observavel;
-
 import game.persistencia.EstadoJogador;
 import game.persistencia.EstadoJogo;
 import game.persistencia.SaveManager;
@@ -39,6 +38,14 @@ public class Fachada extends Observavel {
         }
         return instancia;
     }
+    
+    // === MÉTODOS DE CONTROLE DO JOGO ===
+    
+    public void resetarJogo() {
+        this.jogadores.clear();
+        this.indiceJogadorAtual = 0;
+
+    }
 
     // === JOGADORES ===
     public void adicionarJogador(int numero, String cor) {
@@ -51,19 +58,16 @@ public class Fachada extends Observavel {
     }
 
     public Jogador getJogador(int indice) {
-        return jogadores.get(indice);
+        if (indice >= 0 && indice < jogadores.size()) {
+            return jogadores.get(indice);
+        }
+        return null;
     }
 
     public Jogador getJogadorAtual() {
         if (jogadores.isEmpty()) return null;
-
-        if (indiceJogadorAtual >= jogadores.size()) {
-            indiceJogadorAtual = 0;
-        }
-
         return jogadores.get(indiceJogadorAtual);
     }
-
 
     public void proximoJogador() {
         if (!jogadores.isEmpty()) {
@@ -72,49 +76,48 @@ public class Fachada extends Observavel {
     }
     
     public String getCorJogadorAtual() {
-        return getJogadorAtual().getCor();
+        Jogador j = getJogadorAtual();
+        return (j != null) ? j.getCor() : "";
+    }
+    
+    public ArrayList<String> getCorJogadores() {
+        ArrayList<String> cores = new ArrayList<>();
+        for (Jogador j : jogadores) {
+            cores.add(j.getCor());
+        }
+        return cores;
     }
     
     public void notificarInfos(int indice) {
-    	if (indice < 0 || indice >= jogadores.size()) {
-            System.out.println("Tentativa de acessar jogador inválido após falência!");
-            return;
-        }
-
-        Jogador j = jogadores.get(indice);
+        Jogador j = getJogador(indice);
+        if (j == null) return;
 
         double dinheiro = j.getDinheiro();
-        ArrayList<CardPropriedade> propriedades = j.getPropriedades();
-        ArrayList<CardCompanhia> companhias = j.getCompanhias();
-        boolean temHabeas = j.temHabeasCorpus();
-        String cor = j.getCor();
-
         ArrayList<String> propriedades_j = new ArrayList<>();
-        for (CardPropriedade prop : propriedades) {
+        for (CardPropriedade prop : j.getPropriedades()) {
             propriedades_j.add(prop.getNome());
         }
 
         ArrayList<Integer> companhias_j = new ArrayList<>();
-        for (CardCompanhia comp : companhias) {
+        for (CardCompanhia comp : j.getCompanhias()) {
             companhias_j.add(comp.getIdImage());
         }
 
-        // 🔹 Criar evento com todas as infos
         EventoJogo evento = EventoInfosJogador.criar(
                 dinheiro,
                 propriedades_j,
                 companhias_j,
-                temHabeas,
-                cor
+                j.temHabeasCorpus(),
+                j.getCor()
         );
-
-        // 🔹 Notificar observadores (View)
         notificarObservadores(evento);
     }
 
 
     // === TABULEIRO / MOVIMENTAÇÃO ===
     public TipoCasa moverJogador(int casas) {
+        if (jogadores.isEmpty()) return null;
+        
     	Jogador j = jogadores.get(indiceJogadorAtual);
         this.casaAtual = tabuleiro.moverJogador(j, casas);
         
@@ -126,8 +129,11 @@ public class Fachada extends Observavel {
     public void notificarCartaCasa() {
     	Casa casa = this.casaAtual;
     	Jogador j = getJogadorAtual();
+    	if (j == null) return;
+    	
     	boolean compra;
     	boolean dono = false;
+    	
     	if (casa instanceof CardTitulo titulo) {
     		if (titulo.getDono() == null) {
     			compra = true;
@@ -137,7 +143,7 @@ public class Fachada extends Observavel {
     				dono = true;
     			}
     		}
-        	if (titulo.getIdImage()== -1) {
+        	if (titulo.getIdImage() == -1) {
         		EventoExibirCarta evento = new EventoExibirCarta(2, titulo.getIdImage(), titulo.getNome(), compra, dono);
         		notificarObservadores(evento);
         	} else {
@@ -156,28 +162,24 @@ public class Fachada extends Observavel {
         
         TipoAcaoCarta acao = carta.getAcao();
         Jogador j = getJogadorAtual();
+        if (j == null) return;
         
         switch (acao) {
             case IR_PARA_PRISAO:
                 this.prenderJogador(); 
                 break;
-            
             case MOVER_PARA_PONTO_PARTIDA:
                 this.moverJogadorParaPartida();
                 break;
-            
             case PAGAR_DINHEIRO_BANCO:
                 j.debito(carta.getValor());
                 break;
-                
             case RECEBER_DINHEIRO_BANCO:
                 j.credito(carta.getValor());
                 break;
-                
             case SAIDA_LIVRE_PRISAO:
                 j.addHabeasCorpus();
                 break;
-
             case RECEBER_DINHEIRO_JOGADORES:
                 for (Jogador jogador : jogadores) {
                     if (jogador != j) {
@@ -186,72 +188,55 @@ public class Fachada extends Observavel {
                     }
                 }
                 break;
-
             default:
-                System.out.println("Ação da carta '" + acao + "' (ID: " + carta.getId() + ") ainda não implementada.");
+                System.out.println("Ação da carta não implementada.");
         }
-        
         this.deckSorteReves.devolverCarta(carta);
     }
     
 	// === DADO ===
     public ArrayList<Integer> lancarDados() {
-    	ArrayList<Integer> valores = dado.lancarDados(); // usa a sua classe Dado.java
+    	ArrayList<Integer> valores = dado.lancarDados();
         int dado1 = valores.get(0);
         int dado2 = valores.get(1);
-
         notificarObservadores(new EventoLancarDados(dado1, dado2));
         return valores;
     }
     
-    // Novos métodos para o modo teste
-    public void setModoTeste(boolean modo) {
-    	dado.setModoTeste(modo);
-    }
-    
-    public void setValoresTeste(int d1, int d2) {
-    	dado.setValoresTeste(d1, d2);
-    }
-    
-    // == Deck Sorte ou Reves
-    public void setModoTesteCartas(boolean modo) {
-        deckSorteReves.setModoTeste(modo);
-    }
-    
-    public void setProximaCartaTeste(int idCarta) {
-        deckSorteReves.setProximaCartaTeste(idCarta);
-    }
+    public void setModoTeste(boolean modo) { dado.setModoTeste(modo); }
+    public void setValoresTeste(int d1, int d2) { dado.setValoresTeste(d1, d2); }
+    public void setModoTesteCartas(boolean modo) { deckSorteReves.setModoTeste(modo); }
+    public void setProximaCartaTeste(int idCarta) { deckSorteReves.setProximaCartaTeste(idCarta); }
     
     private void moverJogadorParaPartida() {
         Jogador j = getJogadorAtual();
+        if (j == null) return;
         j.setPosicao(0);
-        
         this.premiacaoJogador(); 
-
         notificarObservadores(new EventoMoverJogadorParaPartida(indiceJogadorAtual));
     }
 
-    // === BANCO ===
+    // === BANCO E TRANSAÇÕES ===
     public void impostoJogador() {
     	Jogador j = getJogadorAtual();
-        banco.impostoJogador(j);
+        if (j != null) banco.impostoJogador(j);
     }
 
     public void premiacaoJogador() {
     	Jogador j = getJogadorAtual();
-        banco.premiacaoJogador(j);
+        if (j != null) banco.premiacaoJogador(j);
     }
     
     public boolean construirCasaParaJogador() {
     	Jogador j = getJogadorAtual();
-    	CardPropriedade p = (CardPropriedade) this.casaAtual;
-    	return banco.construirCasaParaJogador(j, p);
+    	if (j == null || !(this.casaAtual instanceof CardPropriedade)) return false;
+    	return banco.construirCasaParaJogador(j, (CardPropriedade) this.casaAtual);
     }
 
     public boolean construirHotelParaJogador() {
     	Jogador j = getJogadorAtual();
-    	CardPropriedade p = (CardPropriedade) this.casaAtual;
-        return banco.construirHotelParaJogador(j, p);
+    	if (j == null || !(this.casaAtual instanceof CardPropriedade)) return false;
+        return banco.construirHotelParaJogador(j, (CardPropriedade) this.casaAtual);
     }
 
     public void pagarMultaPrisao(Jogador j) {
@@ -261,111 +246,75 @@ public class Fachada extends Observavel {
     // === PRISÃO === 
     public void prenderJogador() {
         Jogador j = getJogadorAtual();
-        j.setPreso(true);
-        j.setPosicao(10);
-        EventoMoverJogadorPrisao evento = new EventoMoverJogadorPrisao(indiceJogadorAtual);
-        notificarObservadores(evento);
+        if (j != null) {
+            j.setPreso(true);
+            j.setPosicao(10);
+            EventoMoverJogadorPrisao evento = new EventoMoverJogadorPrisao(indiceJogadorAtual);
+            notificarObservadores(evento);
+        }
     }
     
-    
+    // Proteção contra NullPointer
     public boolean jogadorIsPreso() {
     	Jogador j = getJogadorAtual();
+    	if (j == null) return false; 
     	return j.isPreso();
     }
     
-	/*
-	 * public void processarRodadaPrisao(){ Jogador jogador = getJogadorAtual(); if
-	 * (jogador.isPreso()) { ArrayList<Integer> valores = dado.lancarDados();
-	 * System.out.println("Valores " + valores.get(0) + " e " + valores.get(1)); if
-	 * (valores.get(0) == valores.get(1)) { jogador.setRodadasPreso(0);
-	 * this.soltarJogador(); return; } jogador.incrementarRodadaPreso();
-	 * System.out.println("Jogador " + jogador.getCor() + " está preso há " +
-	 * jogador.getRodadasPreso() + " rodada(s).");
-	 * 
-	 * if (jogador.getRodadasPreso() == 3) {
-	 * System.out.println("Próxima rodada o jogador " + jogador.getCor() +
-	 * " saira do banco pagando uma multa de R$50 caso não acerte os dados"); }
-	 * 
-	 * if (jogador.getRodadasPreso() > 3) { banco.pagarMultaPrisao(jogador);
-	 * jogador.setRodadasPreso(0); this.soltarJogador(); }
-	 * 
-	 * } }
-	 */
-    
     public void processarRodadaPrisao(){
         Jogador jogador = getJogadorAtual();
+        if (jogador == null) return;
         
         if (jogador.isPreso()) {
-            
             if (jogador.temHabeasCorpus()) {
-                jogador.usarHabeasCorpus(); // Gasta a carta
+                jogador.usarHabeasCorpus(); 
                 this.soltarJogador();
-                System.out.println("Jogador " + jogador.getCor() + " usou 'Saída Livre da Prisão'!");
-                return; // Sai da prisão, não joga os dados
+                return; 
             }
             
         	ArrayList<Integer> valores = dado.lancarDados();
-        	System.out.println("Valores " + valores.get(0) + " e " + valores.get(1));
         	if (valores.get(0) == valores.get(1)) {
         		jogador.setRodadasPreso(0);
                 this.soltarJogador();
                 return;
         	}
             jogador.incrementarRodadaPreso();
-            System.out.println("Jogador " + jogador.getCor() + 
-                               " está preso há " + jogador.getRodadasPreso() + " rodada(s).");
-            
-            if (jogador.getRodadasPreso() == 3) {
-            	System.out.println("Próxima rodada o jogador " + jogador.getCor() + " saira do banco pagando uma multa de R$50 caso não acerte os dados");
-            }
             
             if (jogador.getRodadasPreso() > 3) {
             	banco.pagarMultaPrisao(jogador);
                 jogador.setRodadasPreso(0);
                 this.soltarJogador();
             }
-            
         }
     }
 
     public void soltarJogador() {
-        getJogadorAtual().setPreso(false);
-        System.out.println("Jogador " + getJogadorAtual().getCor() + " saiu da prisão!");
+        Jogador j = getJogadorAtual();
+        if (j != null) j.setPreso(false);
     }
-    
     
     public void verificarFalencia() {
         Jogador j = getJogadorAtual();
-        if (j.getDinheiro() < 0) {
-            int removido = indiceJogadorAtual;
-
-            System.out.println("Jogador " + j.getCor() + " faliu e saiu do jogo!");
-
+        if (j != null && j.getDinheiro() < 0) {
             jogadores.remove(j);
-
-            // 🔹 Notifica a view
-            EventoJogadorFaliu evento = new EventoJogadorFaliu(removido);
-            notificarObservadores(evento);
-
-            System.out.println("Indice atual " + indiceJogadorAtual);
-      }
+            if (indiceJogadorAtual >= jogadores.size()) indiceJogadorAtual = 0;
+            
+        }
     }
-
     
-    // == TITULO ==
+    // == TÍTULOS E PROPRIEDADES ==
     
     public String getNomeCasaAtual(){
-    	return this.casaAtual.getNome();
+    	return (this.casaAtual != null) ? this.casaAtual.getNome() : "";
     }
     
     public boolean processarTituloCasaAtual() {
         Casa casa = this.casaAtual;
         Jogador j = getJogadorAtual();
-        if (casa instanceof CardTitulo titulo) {
+        if (j != null && casa instanceof CardTitulo titulo) {
         	return banco.venderTituloParaJogador(j, titulo);
-        } else {
-        	return false;
         }
+        return false;
     }
     
     public boolean verificaConstrucaoHotel() {
@@ -378,40 +327,29 @@ public class Fachada extends Observavel {
     	return true;
     }
     
-    
-    
     public void pagarAluguel(int valorDados) {
         Jogador j = getJogadorAtual();
+        if (j == null || !(this.casaAtual instanceof CardTitulo)) return;
+        
         CardTitulo casa = (CardTitulo) this.casaAtual;
         Jogador dono = casa.getDono();
     
-        if (casa instanceof CardPropriedade propriedade) {
-	        if (dono != null && dono != j) {
-	            int aluguel = propriedade.calcularAluguel(valorDados);
-	            j.debito(aluguel);  
-	            dono.credito(aluguel); 
-	            System.out.println(j.getCor() + " pagou aluguel de " + aluguel + " a " + dono.getCor());
-	        }
-	        
-        } else if (casa instanceof CardCompanhia companhia) {
-            if (dono != null && dono != j) {
-                int aluguel = companhia.calcularAluguel(valorDados);
-                j.debito(aluguel);
-                dono.credito(aluguel);
-                System.out.println(j.getCor() + " pagou aluguel de R$" + aluguel + " para " + dono.getCor());
+        if (dono != null && dono != j) {
+            int aluguel = 0;
+            if (casa instanceof CardPropriedade propriedade) {
+                aluguel = propriedade.calcularAluguel(valorDados);
+            } else if (casa instanceof CardCompanhia companhia) {
+                aluguel = companhia.calcularAluguel(valorDados);
             }
+            j.debito(aluguel);  
+            dono.credito(aluguel); 
         }
     }
     
-    // Só pra visualizar o dinheiro no console
     public double getDinheiroJogadorAtual() {
         Jogador j = getJogadorAtual();
-        if (j != null) {
-            return j.getDinheiro();
-        }
-        return 0; 
+        return (j != null) ? j.getDinheiro() : 0;
     }
-    
     
     // === SALVAMENTO/CARREGAMENTO ===
     
@@ -421,7 +359,6 @@ public class Fachada extends Observavel {
             SaveManager.salvar(estado, arquivo); 
             return true;
         } catch (IOException e) {
-            System.out.println("Erro ao salvar o jogo: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -429,53 +366,37 @@ public class Fachada extends Observavel {
     
     public boolean carregarJogo(File arquivo) throws Exception {
         try {
-            // Lê o estado salvo do arquivo
             EstadoJogo estado = SaveManager.carregar(arquivo);
-            
-            // Restaura o estado no jogo atual
             this.restaurarEstado(estado);
-            
             return true;
-        } catch (IOException e) {
-            System.out.println("Erro ao carregar o jogo: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        } catch (ClassNotFoundException e) {
-            System.out.println("Erro ao interpretar o arquivo salvo: " + e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    
     // Salvar estado
     public EstadoJogo gerarEstado() {
         EstadoJogo estado = new EstadoJogo();
-
         estado.indiceJogadorAtual = indiceJogadorAtual;
 
         for (Jogador j : jogadores) {
             EstadoJogador ej = new EstadoJogador();
-
             ej.numero = j.getNumero_jogador();
             ej.cor = j.getCor();
             ej.dinheiro = j.getDinheiro();
             ej.posicao = j.getPosicao();
             ej.preso = j.isPreso();
             ej.habeas = j.temHabeasCorpus();
-
-            ej.propriedades = new ArrayList<String>(j.getIdPropriedades());
-            ej.companhias = new ArrayList<Integer>(j.getIdCompanhias());
-
+            ej.propriedades = new ArrayList<>(j.getIdPropriedades());
+            ej.companhias = new ArrayList<>(j.getIdCompanhias());
             estado.jogadores.add(ej);
         }
-
         return estado;
     }
     
     // Carregar estado
     public void restaurarEstado(EstadoJogo estado) {
-
         jogadores.clear();
 
         for (EstadoJogador ej : estado.jogadores) {
@@ -484,44 +405,43 @@ public class Fachada extends Observavel {
             j.setPosicao(ej.posicao);
             j.setPreso(ej.preso);
 
-            if (ej.habeas)
-                j.addHabeasCorpus();
+            if (ej.habeas) j.addHabeasCorpus();
 
-            // Restaurar propriedades usando ID
             for (String id : ej.propriedades) {
                 CardPropriedade p = tabuleiro.getPropriedadePorId(id);
-                j.adicionarPropriedade(p); // Tem que ver se tem set
-                p.setDono(j);
+                if (p != null) {
+                    j.adicionarPropriedade(p);
+                    p.setDono(j);
+                }
             }
-
-            // Restaurar companhias
             for (int id : ej.companhias) {
                 CardCompanhia c = tabuleiro.getCompanhiaPorId(id);
-                j.adicionarCompanhia(c);
-                c.setDono(j);
+                if (c != null) {
+                    j.adicionarCompanhia(c);
+                    c.setDono(j);
+                }
             }
-
             jogadores.add(j);
         }
-
         indiceJogadorAtual = estado.indiceJogadorAtual;
     }
     
-    public ArrayList<String> getCorJogadores() {
-        ArrayList<String> cores = new ArrayList<>();
+    // === RELATÓRIO FINAL ===
+    public String gerarRelatorioFinal() {
+        if (jogadores.isEmpty()) return "Não há jogadores.";
 
-        for (Jogador j : jogadores) {
-            cores.add(j.getCor());
-        }
+        jogadores.sort((j1, j2) -> Double.compare(j2.getDinheiro(), j1.getDinheiro()));
 
-        return cores;
-    }
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("🏆 FIM DE JOGO! 🏆\n\n");
+        
+        Jogador vencedor = jogadores.get(0);
+        sb.append("VENCEDOR: ").append(vencedor.getCor())
+          .append(" com R$ ").append(String.format("%.2f", vencedor.getDinheiro()))
+          .append("\n\nClassificação Final:\n");
 
     public void resetarJogo() {
     	this.jogadores.clear();
         this.indiceJogadorAtual = 0;
     }
-
 }
-
