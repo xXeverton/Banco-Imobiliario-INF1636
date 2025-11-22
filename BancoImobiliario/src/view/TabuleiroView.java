@@ -329,8 +329,14 @@ public class TabuleiroView extends JPanel {
         }
 
         // --- Desenha os pinos ---
+        System.out.println(
+        	    "imagensPinos=" + imagensPinos.size() +
+        	    " posicoesPinos=" + posicoesPinos.size() +
+        	    " coresJogadores=" + controller.getCorJogadores().size()
+        );
         if (imagensPinos != null) {
-            for (int i = 0; i < imagensPinos.size(); i++) {
+        	int qtd = Math.min(imagensPinos.size(), posicoesPinos.size());
+            for (int i = 0; i < qtd; i++) {
             	String corJogador = controller.getCorJogadores().get(i);
             	BufferedImage pino = imagensPorCor.get(corJogador);
                 if (pino != null && posicoesPinos != null) {

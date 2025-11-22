@@ -440,12 +440,8 @@ public class Fachada extends Observavel {
           .append(" com R$ ").append(String.format("%.2f", vencedor.getDinheiro()))
           .append("\n\nClassificação Final:\n");
 
-        int pos = 1;
-        for (Jogador j : jogadores) {
-            sb.append(pos).append("º - ").append(j.getCor())
-              .append(" (R$ ").append(String.format("%.2f", j.getDinheiro())).append(")\n");
-            pos++;
-        }
-        return sb.toString();
+    public void resetarJogo() {
+    	this.jogadores.clear();
+        this.indiceJogadorAtual = 0;
     }
 }
