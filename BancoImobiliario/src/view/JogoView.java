@@ -19,6 +19,7 @@ public class JogoView extends JFrame implements Observador{
     private final JButton btnLancarDados = new JButton("🎲 Lançar Dados");
     private final JButton btnProximoJogador = new JButton("➡ Próximo Jogador");
     private final JButton btnSalvamento = new JButton("Salvar Jogo 💾");
+    private final JButton btnEncerrar = new JButton("Encerrar 🏁");
     private ArrayList<JButton> botoesJogadores = new ArrayList<>();
     private final JLabel lblStatus = new JLabel("Bem-vindo ao Banco Imobiliário!");
     private List<String> cores;
@@ -51,7 +52,12 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(btnLancarDados);
         painelBotoes.add(btnProximoJogador);
         painelBotoes.add(btnSalvamento);
+        painelBotoes.add(btnEncerrar);
         painelBotoes.add(lblStatus);
+        
+        btnLancarDados.setEnabled(false);
+        btnProximoJogador.setEnabled(false);
+        btnSalvamento.setEnabled(false);
         
         // 🔹 Painel dos botões MODO TESTADOR
         
@@ -70,6 +76,10 @@ public class JogoView extends JFrame implements Observador{
         painelBotoes.add(comboDado1);
         painelBotoes.add(lblDado2);
         painelBotoes.add(comboDado2);
+        
+        btnLancarDados.setEnabled(false);
+        btnProximoJogador.setEnabled(false);
+        btnSalvamento.setEnabled(false);
         
         // 🔹 Painel Modo testador de cartas sorte ou reves
         lblCarta = new JLabel("Carta ID:");
@@ -94,7 +104,7 @@ public class JogoView extends JFrame implements Observador{
         painelAcoesCarta.setLayout(new FlowLayout());
         painelAcoesCarta.setVisible(false);
 
-     // 🔹 BARRA SUPERIOR (Jogadores)
+       // 🔹 BARRA SUPERIOR (Jogadores)
         painelSuperior = new JPanel();
         painelSuperior.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); 
         painelSuperior.setPreferredSize(new Dimension(0, 60)); // altura semelhante ao inferior
@@ -110,7 +120,21 @@ public class JogoView extends JFrame implements Observador{
 
         setSize(1280, 800);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                int confirm = JOptionPane.showConfirmDialog(
+                    JogoView.this, 
+                    "Fechar a janela encerrará a partida. Deseja continuar?", 
+                    "Encerrar Jogo", 
+                    JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    mostrarVencedorEFechar();
+                }
+            }
+        });
 
         configurarListeners();
 
@@ -121,21 +145,42 @@ public class JogoView extends JFrame implements Observador{
         inicializarInterfacePeloEstadoAtual();
     }
     
-    // Método atualizado para posicionar os pinos visualmente
+
+//    private void inicializarInterfacePeloEstadoAtual() {
+//        this.numJogadores = controller.getJogadores(); 
+//        
+//        
+//        if (this.numJogadores == 0) return; 
+//        
+//        tabuleiroView.inicializarPinos(numJogadores);
+//        
+//        criarBotoesJogadores(numJogadores);
+//        
+//        for(int i=0; i < numJogadores; i++) {
+//            int posicaoSalva = controller.getPosicaoJogador(i);
+//            if (posicaoSalva > 0) {
+//                tabuleiroView.moverPino(i, posicaoSalva);
+//            }
+//        }
+//
+//        lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
+//        
+//        btnLancarDados.setEnabled(true);
+//        btnSalvamento.setEnabled(true);
+//    }
+    
     private void inicializarInterfacePeloEstadoAtual() {
-        // CORREÇÃO: Remova o "int" para atualizar o atributo da classe, não criar uma variável local
         this.numJogadores = controller.getJogadores(); 
+       
+        if (this.numJogadores == 0) {
+            lblStatus.setText("Aguardando jogadores...");
+            return; 
+        }
         
-        // Se por acaso o controller retornar 0 (ex: erro no carregamento), evitamos o crash
-        if (this.numJogadores == 0) return; 
         
-        // 1. Cria os pinos visualmente (todos no início)
         tabuleiroView.inicializarPinos(numJogadores);
-        
-        // 2. Recria os botões superiores
         criarBotoesJogadores(numJogadores);
         
-        // 3. Move os pinos para a posição correta
         for(int i=0; i < numJogadores; i++) {
             int posicaoSalva = controller.getPosicaoJogador(i);
             if (posicaoSalva > 0) {
@@ -145,10 +190,12 @@ public class JogoView extends JFrame implements Observador{
 
         lblStatus.setText("Jogo iniciado! Vez do jogador " + controller.getCorJogadorAtual());
         
+        
         btnLancarDados.setEnabled(true);
         btnSalvamento.setEnabled(true);
     }
     
+       
     @Override
     public void atualizar(EventoJogo evento) {
         switch (evento.getTipo()) {
@@ -165,7 +212,7 @@ public class JogoView extends JFrame implements Observador{
                 String descricao = (String) evento.get("descricao");
 
                 // Chama seu método que exibe a carta na tela
-                exibirCarta(1, idImg, descricao, true, true); // tipo=1 indica Sorte/Reves
+                exibirCarta(1, idImg, descricao, true, true); 
             }
             case "LANCAR_DADOS" -> {
                 int dado1 = (int) evento.get("dado1");
@@ -482,6 +529,19 @@ public class JogoView extends JFrame implements Observador{
             lblStatus.setText("Agora é a vez de " + controller.getCorJogadorAtual());
             tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
         });
+        
+        btnEncerrar.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                this, 
+                "Deseja realmente encerrar a partida agora?", 
+                "Encerrar Jogo", 
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                mostrarVencedorEFechar();
+            }
+        });
     }
 
     private void exibirMensagemVencedor(String corVencedor) {
@@ -588,13 +648,21 @@ public class JogoView extends JFrame implements Observador{
         return comboCartaId;
     }
    
+    private void mostrarVencedorEFechar() {
+        String relatorio = controller.encerrarJogo();
+
+        JOptionPane.showMessageDialog(this, relatorio, "Resultado Final", JOptionPane.INFORMATION_MESSAGE);
+
+        this.dispose();
+        new MenuInicialView().setVisible(true);
+    }
     
     // 🔹 Método main para rodar o jogo
 	
-	/*
-	 * public static void main(String[] args) { SwingUtilities.invokeLater(() -> new
-	 * JogoView()); }
-	 */
-	 
+
+//	public static void main(String[] args) {
+//		SwingUtilities.invokeLater(() -> new JogoView());
+//	}
+//	 
 	 
 }
