@@ -39,14 +39,12 @@ public class Fachada extends Observavel {
         return instancia;
     }
     
-    // === MÉTODOS DE CONTROLE DO JOGO (NOVO) ===
+    // === MÉTODOS DE CONTROLE DO JOGO ===
     
-    // Este método faltava e é essencial para o "Novo Jogo" funcionar
     public void resetarJogo() {
         this.jogadores.clear();
         this.indiceJogadorAtual = 0;
-        // Se necessário, resete o tabuleiro ou baralho aqui também
-        // ex: this.deckSorteReves = new DeckSorteReves();
+
     }
 
     // === JOGADORES ===
@@ -259,7 +257,7 @@ public class Fachada extends Observavel {
     // Proteção contra NullPointer
     public boolean jogadorIsPreso() {
     	Jogador j = getJogadorAtual();
-    	if (j == null) return false; // Se não tem jogador, não quebra o jogo
+    	if (j == null) return false; 
     	return j.isPreso();
     }
     
