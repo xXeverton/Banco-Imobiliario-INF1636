@@ -519,7 +519,8 @@ public class Fachada extends Observavel {
 
 
     public void resetarJogo() {
-        instancia = new Fachada();
+    	this.jogadores.clear();
+        this.indiceJogadorAtual = 0;
     }
 
 }

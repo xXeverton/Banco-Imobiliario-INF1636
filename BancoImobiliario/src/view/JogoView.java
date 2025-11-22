@@ -209,7 +209,7 @@ public class JogoView extends JFrame implements Observador{
             case "JOGADOR_FALIU" -> {
                 int index = (int) evento.get("indiceJogador");
                 this.numJogadores--;
-                
+                tabuleiroView.removerPinoJogador(index);
                 
                 JOptionPane.showMessageDialog(
                         this,
@@ -221,10 +221,7 @@ public class JogoView extends JFrame implements Observador{
                 tabuleiroView.setCorJogadorAtual(corPara(controller.getCorJogadorAtual()));
                 
                 // 🔥 1. Remover botão do jogador
-                this.criarBotoesJogadores(numJogadores);
-                
-                // 🔥 3. Remover pino e reindexar pinos
-                tabuleiroView.removerPinoJogador(index);
+                this.criarBotoesJogadores(numJogadores);                
 
                 // 🔥 5. Ajustar jogadorAtual
                 if (jogadorAtual >= numJogadores) {
